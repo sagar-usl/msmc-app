@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div>
+  <div style="position:sticky;top:0;z-index:3;background:#fff;display:flex;align-items:center;gap:12px;padding:14px 16px;box-shadow:0 1px 0 rgba(11,61,145,0.08)">
+    <div onClick="{{ goHome }}" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:#F5F7FA">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    </div>
+    <div style="font-size:16px;font-weight:700;color:#14213d">{{ t.headerTitle }}</div>
+  </div>
+
+  <sc-if value="{{ submitted }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:40px 24px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;animation:scaleIn 0.4s ease both">
+      <div style="width:64px;height:64px;border-radius:50%;background:rgba(46,125,50,0.12);display:flex;align-items:center;justify-content:center">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <div style="font-size:16px;font-weight:700;color:#14213d">{{ t.thankYou }}</div>
+      <div style="font-size:12.5px;color:#5f6368;line-height:1.6">{{ t.thankYouSub }}</div>
+      <div onClick="{{ resetForm }}" style="margin-top:8px;color:#0B3D91;font-size:13px;font-weight:600;cursor:pointer;text-decoration:underline">{{ t.submitAnother }}</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showForm }}" hint-placeholder-val="{{ true }}">
+    <div style="padding:20px 16px 8px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px 0 4px">
+        <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,153,51,0.12);display:flex;align-items:center;justify-content:center">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF9933" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+        </div>
+        <div style="font-size:14.5px;font-weight:700;color:#14213d">{{ t.heading }}</div>
+        <div style="font-size:11.5px;color:#5f6368;text-align:center;line-height:1.5;padding:0 20px">{{ t.subheading }}</div>
+      </div>
+
+      <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 12px rgba(11,61,145,0.08);display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;justify-content:center;gap:8px">
+          <sc-for list="{{ stars }}" as="star" hint-placeholder-count="5">
+            <div onClick="{{ star.onClick }}" style="cursor:pointer">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="{{ star.fill }}" stroke="#FF9933" stroke-width="1.5" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ errors.rating }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;color:#c0392b;text-align:center">{{ t.ratingError }}</div></sc-if>
+
+        <div>
+          <div style="font-size:11.5px;font-weight:600;color:#5f6368;margin-bottom:6px">{{ t.nameLabel }}</div>
+          <input value="{{ name }}" onChange="{{ onNameChange }}" placeholder="{{ t.namePlaceholder }}" style="width:100%;border:1.5px solid #dfe3e8;border-radius:10px;padding:11px 13px;font-size:13px;font-family:inherit;outline:none;color:#14213d" />
+        </div>
+
+        <div>
+          <div style="font-size:11.5px;font-weight:600;color:#5f6368;margin-bottom:6px">{{ t.feedbackLabel }}</div>
+          <textarea value="{{ message }}" onChange="{{ onMessageChange }}" placeholder="{{ t.feedbackPlaceholder }}" rows="4" style="width:100%;border:1.5px solid {{ msgBorder }};border-radius:10px;padding:11px 13px;font-size:13px;font-family:inherit;outline:none;resize:none;color:#14213d"></textarea>
+          <sc-if value="{{ errors.message }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;color:#c0392b;margin-top:4px">{{ t.messageError }}</div></sc-if>
+        </div>
+
+        <div onClick="{{ submit }}" style="background:#0B3D91;color:#fff;text-align:center;padding:13px;border-radius:12px;font-size:13.5px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(11,61,145,0.3)" style-hover="background:#082a66">{{ t.submitBtn }}</div>
+      </div>
+      <div style="height:8px"></div>
+    </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const T = {
+  en: {
+    headerTitle: 'Feedback', thankYou: 'Thank You!',
+    thankYouSub: 'Your feedback helps us improve our services for the community.',
+    submitAnother: 'Submit Another Response',
+    heading: 'We Value Your Feedback', subheading: 'Help us improve our services by sharing your experience',
+    ratingError: 'Please select a star rating',
+    nameLabel: 'Your Name (optional)', namePlaceholder: 'Enter your name',
+    feedbackLabel: 'Your Feedback', feedbackPlaceholder: 'Tell us about your experience',
+    messageError: 'Please share a few words of feedback',
+    submitBtn: 'Submit Feedback',
+  },
+  mr: {
+    headerTitle: 'अभिप्राय', thankYou: 'धन्यवाद!',
+    thankYouSub: 'आपला अभिप्राय आम्हाला समुदायासाठी सेवा सुधारण्यास मदत करतो.',
+    submitAnother: 'आणखी एक प्रतिसाद सबमिट करा',
+    heading: 'आम्हाला तुमचा अभिप्राय हवा आहे', subheading: 'तुमचा अनुभव सांगून आम्हाला सेवा सुधारण्यास मदत करा',
+    ratingError: 'कृपया स्टार रेटिंग निवडा',
+    nameLabel: 'तुमचे नाव (ऐच्छिक)', namePlaceholder: 'तुमचे नाव प्रविष्ट करा',
+    feedbackLabel: 'तुमचा अभिप्राय', feedbackPlaceholder: 'तुमच्या अनुभवाबद्दल सांगा',
+    messageError: 'कृपया थोडक्यात अभिप्राय द्या',
+    submitBtn: 'अभिप्राय सबमिट करा',
+  },
+};
+
+class Component extends DCLogic {
+  state = { name: '', rating: 0, message: '', errors: {}, submitted: false };
+
+  setRating = (r) => this.setState(s => ({ rating: r, errors: { ...s.errors, rating: null } }));
+  setField = (field, val) => this.setState(s => ({ [field]: val, errors: { ...s.errors, [field]: null } }));
+
+  submit = () => {
+    const { rating, message } = this.state;
+    const errors = {};
+    if (!rating) errors.rating = true;
+    if (!message.trim() || message.trim().length < 5) errors.message = true;
+    if (Object.keys(errors).length) { this.setState({ errors }); return; }
+    this.setState({ submitted: true });
+  };
+
+  resetForm = () => this.setState({ name: '', rating: 0, message: '', errors: {}, submitted: false });
+
+  renderVals() {
+    const t = T[this.props.lang === 'mr' ? 'mr' : 'en'];
+    const s = this.state;
+    const stars = [1, 2, 3, 4, 5].map(n => ({
+      key: n, fill: n <= s.rating ? '#FF9933' : 'none', onClick: () => this.setRating(n),
+    }));
+    return {
+      l: this.props.l || {}, t,
+      goHome: () => this.props.go && this.props.go('home'),
+      showForm: !s.submitted, submitted: s.submitted,
+      stars, name: s.name, message: s.message, errors: s.errors,
+      msgBorder: s.errors.message ? '#c0392b' : '#dfe3e8',
+      onNameChange: (e) => this.setField('name', e.target.value),
+      onMessageChange: (e) => this.setField('message', e.target.value),
+      submit: this.submit, resetForm: this.resetForm,
+    };
+  }
+}
+
+</script>
+</body>
+</html>

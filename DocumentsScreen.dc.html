@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div>
+  <div style="position:sticky;top:0;z-index:3;background:#fff;display:flex;align-items:center;gap:12px;padding:14px 16px;box-shadow:0 1px 0 rgba(11,61,145,0.08)">
+    <div onClick="{{ goHome }}" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:#F5F7FA">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    </div>
+    <div style="font-size:16px;font-weight:700;color:#14213d;flex:1">{{ t.title }}</div>
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  </div>
+
+  <div style="display:flex;gap:8px;padding:14px 16px 4px;overflow-x:auto">
+    <sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="4">
+      <div onClick="{{ tab.onClick }}" style="flex-shrink:0;padding:8px 16px;border-radius:100px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ tab.bg }};color:{{ tab.color }}">{{ tab.label }}</div>
+    </sc-for>
+  </div>
+
+  <div style="padding:12px 16px 8px;display:flex;flex-direction:column;gap:10px">
+    <sc-for list="{{ filteredDocs }}" as="doc" hint-placeholder-count="4">
+      <div style="background:#fff;border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 8px rgba(11,61,145,0.06);cursor:pointer" style-hover="box-shadow:0 4px 14px rgba(11,61,145,0.14)">
+        <div style="width:42px;height:42px;border-radius:10px;background:{{ doc.tint }};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ doc.title }}</div>
+          <div style="font-size:11px;color:#8a8f98;margin-top:2px">{{ doc.meta }}</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13m0 0l-4-4m4 4l4-4"/><path d="M4 21h16"/></svg>
+      </div>
+    </sc-for>
+    <div style="height:8px"></div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const T = {
+  en: {
+    title: 'Documents', cats: ['All', 'Reports', 'Acts & Rules', 'Policies'],
+    docs: [
+      { title: 'Annual Report 2024-25', meta: 'PDF · 2.4 MB · Reports', cat: 'Reports', tint: '#0B3D91' },
+      { title: 'Government Resolution - GR/2026/14', meta: 'PDF · 1.8 MB · Acts & Rules', cat: 'Acts & Rules', tint: '#FF9933' },
+      { title: 'Minority Commission Act, 2004', meta: 'PDF · 3.1 MB · Acts & Rules', cat: 'Acts & Rules', tint: '#FF9933' },
+      { title: 'Scholarship Disbursement Policy', meta: 'PDF · 2.0 MB · Policies', cat: 'Policies', tint: '#2E7D32' },
+      { title: 'RTI Handbook', meta: 'PDF · 1.2 MB · Policies', cat: 'Policies', tint: '#2E7D32' },
+      { title: 'Grievance Redressal Report Q1 2026', meta: 'PDF · 900 KB · Reports', cat: 'Reports', tint: '#0B3D91' },
+    ],
+  },
+  mr: {
+    title: 'दस्तऐवज', cats: ['सर्व', 'अहवाल', 'कायदे व नियम', 'धोरणे'],
+    docs: [
+      { title: 'वार्षिक अहवाल २०२४-२५', meta: 'PDF · 2.4 MB · अहवाल', cat: 'अहवाल', tint: '#0B3D91' },
+      { title: 'शासन निर्णय - GR/2026/14', meta: 'PDF · 1.8 MB · कायदे व नियम', cat: 'कायदे व नियम', tint: '#FF9933' },
+      { title: 'अल्पसंख्याक आयोग कायदा, २००४', meta: 'PDF · 3.1 MB · कायदे व नियम', cat: 'कायदे व नियम', tint: '#FF9933' },
+      { title: 'शिष्यवृत्ती वितरण धोरण', meta: 'PDF · 2.0 MB · धोरणे', cat: 'धोरणे', tint: '#2E7D32' },
+      { title: 'माहिती अधिकार पुस्तिका', meta: 'PDF · 1.2 MB · धोरणे', cat: 'धोरणे', tint: '#2E7D32' },
+      { title: 'तक्रार निवारण अहवाल Q1 2026', meta: 'PDF · 900 KB · अहवाल', cat: 'अहवाल', tint: '#0B3D91' },
+    ],
+  },
+};
+
+class Component extends DCLogic {
+  state = { tabIdx: 0 };
+  setTab = (i) => this.setState({ tabIdx: i });
+
+  renderVals() {
+    const t = T[this.props.lang === 'mr' ? 'mr' : 'en'];
+    const activeCat = t.cats[this.state.tabIdx];
+    const tabs = t.cats.map((c, i) => ({
+      key: c, label: c, onClick: () => this.setTab(i),
+      bg: this.state.tabIdx === i ? '#0B3D91' : '#F5F7FA',
+      color: this.state.tabIdx === i ? '#fff' : '#5f6368',
+    }));
+    const filteredDocs = this.state.tabIdx === 0 ? t.docs : t.docs.filter(d => d.cat === activeCat);
+    return {
+      l: this.props.l || {}, t,
+      goHome: () => this.props.go && this.props.go('home'),
+      tabs, filteredDocs,
+    };
+  }
+}
+
+</script>
+</body>
+</html>

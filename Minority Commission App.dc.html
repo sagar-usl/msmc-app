@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Noto+Sans+Devanagari:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body{margin:0;background:#e8eaed;font-family:'Roboto','Noto Sans Devanagari',system-ui,sans-serif}
+    * { box-sizing: border-box; }
+    ::-webkit-scrollbar{width:0;height:0}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes drawerIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+    @keyframes scaleIn{from{opacity:0;transform:scale(0.9)}to{opacity:1;transform:scale(1)}}
+    @keyframes pulseRing{0%{box-shadow:0 0 0 0 rgba(255,153,51,0.5)}100%{box-shadow:0 0 0 14px rgba(255,153,51,0)}}
+  </style>
+</helmet>
+<x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px" style="display:flex;justify-content:center;padding:36px 20px">
+
+  <div style="width:100%;height:100%;position:relative;background:#F5F7FA;display:flex;flex-direction:column;font-family:'Roboto','Noto Sans Devanagari',system-ui,sans-serif">
+
+    <!-- ============ SPLASH ============ -->
+    <sc-if value="{{ isSplash }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;inset:0;z-index:50;background:linear-gradient(160deg,#0B3D91 0%,#082a66 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;overflow:hidden">
+        <div style="position:absolute;inset:0;opacity:0.08;background-image:repeating-linear-gradient(45deg,#fff 0 2px,transparent 2px 26px);pointer-events:none"></div>
+        <div style="width:112px;height:112px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 6px rgba(255,153,51,0.18),0 12px 40px rgba(0,0,0,0.35);animation:scaleIn 0.7s ease both, pulseRing 2.4s ease-out infinite;padding:14px">
+          <img src="official-logo-splash.png" alt="Official Emblem" style="width:100%;height:100%;object-fit:contain" />
+        </div>
+        <div style="text-align:center;animation:slideUp 0.7s ease 0.15s both;padding:0 34px">
+          <div style="color:#fff;font-size:21px;font-weight:700;line-height:1.3">Maharashtra State<br/>Minority Commission</div>
+          <div style="color:rgba(255,255,255,0.65);font-size:11px;letter-spacing:0.14em;margin-top:6px;font-weight:500">GOVERNMENT OF MAHARASHTRA</div>
+        </div>
+        <div style="color:#FFC876;font-size:14px;font-weight:500;margin-top:8px;animation:slideUp 0.7s ease 0.3s both">समतेसाठी, सशक्तीकरणासाठी, प्रगतीसाठी</div>
+        <div style="position:absolute;bottom:46px;display:flex;gap:6px;animation:fadeIn 0.7s ease 0.5s both">
+          <div style="width:7px;height:7px;border-radius:50%;background:#fff;opacity:0.9"></div>
+          <div style="width:7px;height:7px;border-radius:50%;background:#fff;opacity:0.5"></div>
+          <div style="width:7px;height:7px;border-radius:50%;background:#fff;opacity:0.5"></div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ MAIN APP (fades in after splash) ============ -->
+    <sc-if value="{{ showApp }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;display:flex;flex-direction:column;min-height:0;animation:fadeIn 0.5s ease both">
+
+      <!-- HEADER -->
+      <div style="flex-shrink:0;background:#fff;box-shadow:0 1px 0 rgba(11,61,145,0.08);padding:10px 8px;display:flex;align-items:center;gap:6px;position:relative;z-index:5">
+
+        <!-- LEFT: CM (compact) -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;width:58px;flex-shrink:0">
+          <img src="cm-avatar.png" alt="Chief Minister" style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:1.5px solid #FF9933" />
+          <div style="font-size:7.8px;font-weight:700;color:#0B3D91;text-align:center;line-height:1.15;font-family:'Noto Sans Devanagari','Roboto',sans-serif">{{ L.cmNameShort }}</div>
+          <div style="font-size:7px;color:#8a8f98;text-align:center;line-height:1.1">{{ L.cmTitleShort }}</div>
+        </div>
+
+        <!-- CENTER: Department identity -->
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;min-width:0;padding:0 2px">
+          <img src="official-logo.png" alt="Emblem" style="width:32px;height:auto;flex-shrink:0;object-fit:contain" />
+          <div style="min-width:0;text-align:left">
+            <div style="font-size:12.5px;font-weight:800;color:#0B3D91;line-height:1.18;letter-spacing:-0.01em">{{ L.appNameLine1 }}<br/>{{ L.appNameLine2 }}</div>
+            <div style="font-size:8px;color:#8a8f98;font-weight:600;letter-spacing:0.03em;margin-top:2px;text-transform:uppercase">{{ L.govOf }}</div>
+          </div>
+        </div>
+
+        <!-- RIGHT: icons -->
+        <div style="display:flex;align-items:center;gap:0;flex-shrink:0">
+          <div onClick="{{ noop }}" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:#F5F7FA">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+          <div onClick="{{ toggleLang }}" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-weight:700;color:#0B3D91" style-hover="background:#F5F7FA">{{ L.langBtn }}</div>
+          <div onClick="{{ noop }}" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative" style-hover="background:#F5F7FA">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <div style="position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:#FF9933;border:1.5px solid #fff"></div>
+          </div>
+          <div onClick="{{ toggleDrawer }}" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:#F5F7FA">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCROLLABLE CONTENT -->
+      <div style="flex:1;overflow-y:auto;overflow-x:hidden;position:relative">
+
+        <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+          <dc-import name="HomeScreen" hint-size="100%,100%" l="{{ L }}" lang="{{ lang }}" slides="{{ slides }}" dots="{{ dots }}" go="{{ go }}"></dc-import>
+        </sc-if>
+        <sc-if value="{{ isAbout }}" hint-placeholder-val="{{ false }}">
+          <dc-import name="AboutScreen" hint-size="100%,100%" l="{{ L }}" lang="{{ lang }}" go="{{ go }}"></dc-import>
+        </sc-if>
+        <sc-if value="{{ isDocuments }}" hint-placeholder-val="{{ false }}">
+          <dc-import name="DocumentsScreen" hint-size="100%,100%" l="{{ L }}" lang="{{ lang }}" go="{{ go }}"></dc-import>
+        </sc-if>
+        <sc-if value="{{ isInitiatives }}" hint-placeholder-val="{{ false }}">
+          <dc-import name="InitiativesScreen" hint-size="100%,100%" l="{{ L }}" lang="{{ lang }}" go="{{ go }}"></dc-import>
+        </sc-if>
+        <sc-if value="{{ isSchemes }}" hint-placeholder-val="{{ false }}">
+          <dc-import name="SchemesScreen" hint-size="100%,100%" l="{{ L }}" lang="{{ lang }}" go="{{ go }}"></dc-import>
+        </sc-if>
+        <sc-if value="{{ isPmScheme }}" hint-placeholder-val="{{ false }}">
+          <dc-import name="PMSchemeScreen" hint-size="100%,100%" l="{{ L }}" lang="{{ lang }}" go="{{ go }}"></dc-import>
+        </sc-if>
+        <sc-if value="{{ isEducation }}" hint-placeholder-val="{{ false }}">
+          <dc-import name="EducationScreen" hint-size="100%,100%" l="{{ L }}" lang="{{ lang }}" go="{{ go }}"></dc-import>
+        </sc-if>
+        <sc-if value="{{ isNews }}" hint-placeholder-val="{{ false }}">
+          <dc-import name="NewsScreen" hint-size="100%,100%" l="{{ L }}" lang="{{ lang }}" go="{{ go }}"></dc-import>
+        </sc-if>
+        <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+          <dc-import name="ProfileScreen" hint-size="100%,100%" l="{{ L }}" lang="{{ lang }}" go="{{ go }}"></dc-import>
+        </sc-if>
+        <sc-if value="{{ isComplaint }}" hint-placeholder-val="{{ false }}">
+          <dc-import name="ComplaintScreen" hint-size="100%,100%" l="{{ L }}" lang="{{ lang }}" go="{{ go }}"></dc-import>
+        </sc-if>
+        <sc-if value="{{ isFeedback }}" hint-placeholder-val="{{ false }}">
+          <dc-import name="FeedbackScreen" hint-size="100%,100%" l="{{ L }}" lang="{{ lang }}" go="{{ go }}"></dc-import>
+        </sc-if>
+
+      </div>
+
+      <!-- BOTTOM NAV -->
+      <div style="flex-shrink:0;background:#fff;box-shadow:0 -2px 12px rgba(11,61,145,0.08);display:flex;align-items:stretch;padding:6px 2px 8px;z-index:5">
+        <sc-for list="{{ bottomTabs }}" as="tab" hint-placeholder-count="5">
+          <div onClick="{{ tab.onClick }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;cursor:pointer;color:{{ tab.color }};min-height:44px;justify-content:center">
+            <div style="width:24px;height:24px" dangerouslySetInnerHTML="{{ tab.iconHtml }}"></div>
+            <div style="font-size:10px;font-weight:{{ tab.weight }}">{{ tab.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ============ DRAWER OVERLAY ============ -->
+    <sc-if value="{{ drawerOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ toggleDrawer }}" style="position:absolute;inset:0;background:rgba(11,20,40,0.5);z-index:40;animation:fadeIn 0.25s ease both"></div>
+      <div style="position:absolute;top:0;left:0;bottom:0;width:78%;max-width:300px;background:#fff;z-index:41;box-shadow:8px 0 30px rgba(0,0,0,0.25);animation:drawerIn 0.32s cubic-bezier(.2,.9,.3,1) both;display:flex;flex-direction:column;overflow:hidden">
+        <div style="background:linear-gradient(135deg,#0B3D91,#082a66);padding:26px 20px 20px;display:flex;flex-direction:column;gap:10px;position:relative">
+          <div onClick="{{ toggleDrawer }}" style="position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </div>
+          <div style="width:52px;height:52px;border-radius:50%;background:#FF9933;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:19px">MC</div>
+          <div style="color:#fff;font-size:15px;font-weight:700">{{ L.drawerAppName }}</div>
+          <div style="color:rgba(255,255,255,0.6);font-size:11px">{{ L.drawerAppSub }}</div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:10px 8px">
+          <sc-for list="{{ drawerItems }}" as="item" hint-placeholder-count="7">
+            <div onClick="{{ item.onClick }}" style="display:flex;align-items:center;gap:14px;padding:13px 12px;border-radius:12px;cursor:pointer" style-hover="background:#F5F7FA">
+              <div style="width:38px;height:38px;border-radius:10px;background:rgba(11,61,145,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0" dangerouslySetInnerHTML="{{ item.iconHtml }}"></div>
+              <div style="font-size:14px;font-weight:500;color:#1a1a2e">{{ item.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding:16px 20px;border-top:1px solid #eef0f3;display:flex;align-items:center;gap:10px">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          <div style="font-size:12px;color:#2E7D32;font-weight:600">1800-123-4567</div>
+        </div>
+      </div>
+    </sc-if>
+
+  </div>
+</x-import>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const ICONS = {
+  home: '<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>',
+  schemes: '<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>',
+  news: '<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="12" y2="16"/></svg>',
+  complaint: '<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V4a1 1 0 011-1h11l4 4v9a1 1 0 01-1 1H8l-4 4z" transform="scale(0.9) translate(1.2,1.2)"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="15.5" r="0.8" fill="currentColor" stroke="none"/></svg>',
+  profile: '<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>',
+  about: '<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.7" r="0.9" fill="#0B3D91" stroke="none"/></svg>',
+  documents: '<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>',
+  initiatives: '<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a6 6 0 00-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0012 2z"/></svg>',
+  education: '<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8l10-5 10 5-10 5-10-5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg>',
+  feedback: '<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>',
+  profileDrawer: '<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>',
+  pmscheme: '<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>',
+};
+
+const T = {
+  en: {
+    cmName: 'Shri. Devendra Fadnavis', cmTitle: 'Chief Minister, Maharashtra',
+    cmNameShort: 'Shri. D. Fadnavis', cmTitleShort: 'Chief Minister',
+    appNameLine1: 'Maharashtra State', appNameLine2: 'Minority Commission', govOf: 'Government of Maharashtra',
+    langBtn: 'मr', drawerAppName: 'Minority Commission', drawerAppSub: 'Govt. of Maharashtra',
+    navHome: 'Home', navSchemes: 'Schemes', navNews: 'News', navComplaint: 'Complaint', navProfile: 'Profile', navInitiatives: 'Initiatives',
+    drawerAbout: 'About Department', drawerDocuments: 'Documents', drawerInitiatives: 'Initiatives',
+    drawerSchemes: 'Minority Welfare Schemes', drawerEducation: 'Education & Scholarship',
+    drawerComplaint: 'Complaint', drawerFeedback: 'Feedback', drawerProfile: 'Profile',
+    drawerPmScheme: "PM's New 15 Point Programme",
+    chairmanLabel: "Chairman's Message", chairmanName: 'Shri. Pyare Ziya Khan',
+    chairmanTitle: 'Chairman, Maharashtra State Minority Commission',
+    chairmanMsg: '"Our commitment is to ensure every citizen from minority communities has equal access to education, employment and dignity. This platform brings our services closer to you."',
+    aboutLabel: 'About the Department', aboutText: 'The Minority Development Department (Minority Commission) works for the socio-economic development, welfare and protection of minority communities across Maharashtra through policy, schemes and grievance redressal.',
+    missionTitle: 'Mission', missionText: 'Ensure equitable access to education, employment and welfare for minority communities.',
+    visionTitle: 'Vision', visionText: 'An empowered, self-reliant minority population contributing to the progress of Maharashtra.',
+    knowMore: 'Know More About Us',
+    footerLinks: ['Feedback', 'Website Policies', 'Contact Us', 'Help'],
+    footerCopyright: '© 2026 Minority Development Department, Government of Maharashtra',
+    back: 'Back',
+  },
+  mr: {
+    cmName: 'श्री. देवेंद्र फडणवीस', cmTitle: 'मुख्यमंत्री, महाराष्ट्र',
+    cmNameShort: 'श्री. फडणवीस', cmTitleShort: 'मुख्यमंत्री',
+    appNameLine1: 'महाराष्ट्र राज्य', appNameLine2: 'अल्पसंख्याक आयोग', govOf: 'महाराष्ट्र शासन',
+    langBtn: 'EN', drawerAppName: 'अल्पसंख्याक आयोग', drawerAppSub: 'महाराष्ट्र शासन',
+    navHome: 'मुख्यपृष्ठ', navSchemes: 'योजना', navNews: 'बातम्या', navComplaint: 'तक्रार', navProfile: 'प्रोफाइल', navInitiatives: 'उपक्रम',
+    drawerAbout: 'विभागाबद्दल', drawerDocuments: 'दस्तऐवज', drawerInitiatives: 'उपक्रम',
+    drawerSchemes: 'अल्पसंख्याक कल्याण योजना', drawerEducation: 'शिक्षण व शिष्यवृत्ती',
+    drawerComplaint: 'तक्रार', drawerFeedback: 'अभिप्राय', drawerProfile: 'प्रोफाइल',
+    drawerPmScheme: 'पंतप्रधानांचा १५ कलमी कार्यक्रम',
+    chairmanLabel: 'अध्यक्षांचा संदेश', chairmanName: 'श्री. प्यारे झिया खान',
+    chairmanTitle: 'अध्यक्ष, महाराष्ट्र राज्य अल्पसंख्याक आयोग',
+    chairmanMsg: '"अल्पसंख्याक समुदायातील प्रत्येक नागरिकाला शिक्षण, रोजगार आणि सन्मानाचा समान हक्क मिळावा यासाठी आम्ही कटिबद्ध आहोत."',
+    aboutLabel: 'विभागाबद्दल', aboutText: 'अल्पसंख्याक विकास विभाग (अल्पसंख्याक आयोग) धोरण, योजना आणि तक्रार निवारणाद्वारे महाराष्ट्रातील अल्पसंख्याक समुदायांच्या सामाजिक-आर्थिक विकासासाठी आणि कल्याणासाठी कार्य करतो.',
+    missionTitle: 'ध्येय', missionText: 'अल्पसंख्याक समुदायांना शिक्षण, रोजगार आणि कल्याणाचा समान प्रवेश सुनिश्चित करणे.',
+    visionTitle: 'दृष्टी', visionText: 'महाराष्ट्राच्या प्रगतीत योगदान देणारी सक्षम, स्वयंपूर्ण अल्पसंख्याक लोकसंख्या.',
+    knowMore: 'अधिक जाणून घ्या',
+    footerLinks: ['अभिप्राय', 'संकेतस्थळ धोरणे', 'संपर्क', 'मदत'],
+    footerCopyright: '© २०२६ अल्पसंख्याक विकास विभाग, महाराष्ट्र शासन',
+    back: 'मागे',
+  }
+};
+
+class Component extends DCLogic {
+  state = {
+    screen: 'splash',
+    showApp: false,
+    drawerOpen: false,
+    lang: 'en',
+    slideIdx: 0,
+  };
+
+  componentDidMount() {
+    this._splashTimer = setTimeout(() => this.setState({ screen: 'home', showApp: true }), 2600);
+    this._carouselTimer = setInterval(() => {
+      this.setState(s => ({ slideIdx: (s.slideIdx + 1) % 4 }));
+    }, 4200);
+  }
+  componentWillUnmount() {
+    clearTimeout(this._splashTimer);
+    clearInterval(this._carouselTimer);
+  }
+
+  go = (screen) => { this.setState({ screen, drawerOpen: false }); };
+  toggleDrawer = () => this.setState(s => ({ drawerOpen: !s.drawerOpen }));
+  toggleLang = () => this.setState(s => ({ lang: s.lang === 'en' ? 'mr' : 'en' }));
+  goToSlide = (i) => this.setState({ slideIdx: i });
+  noop = () => {};
+
+  renderVals() {
+    const lang = this.state.lang;
+    const L = T[lang];
+    const screen = this.state.screen;
+    const iconWrap = (svg, color) => ({ __html: `<div style="color:${color};width:100%;height:100%">${svg}</div>` });
+
+    const drawerItems = [
+      { key: 'about', label: L.drawerAbout, iconHtml: { __html: ICONS.about }, onClick: () => this.go('about') },
+      { key: 'pmscheme', label: L.drawerPmScheme, iconHtml: { __html: ICONS.pmscheme }, onClick: () => this.go('pmscheme') },
+      { key: 'documents', label: L.drawerDocuments, iconHtml: { __html: ICONS.documents }, onClick: () => this.go('documents') },
+      { key: 'initiatives', label: L.drawerInitiatives, iconHtml: { __html: ICONS.initiatives }, onClick: () => this.go('initiatives') },
+      { key: 'schemes', label: L.drawerSchemes, iconHtml: { __html: ICONS.schemes }, onClick: () => this.go('schemes') },
+      { key: 'education', label: L.drawerEducation, iconHtml: { __html: ICONS.education }, onClick: () => this.go('education') },
+      { key: 'complaint', label: L.drawerComplaint, iconHtml: { __html: ICONS.complaint }, onClick: () => this.go('complaint') },
+      { key: 'feedback', label: L.drawerFeedback, iconHtml: { __html: ICONS.feedback }, onClick: () => this.go('feedback') },
+      { key: 'profile', label: L.drawerProfile, iconHtml: { __html: ICONS.profileDrawer }, onClick: () => this.go('profile') },
+    ];
+
+    const navColor = (name) => screen === name ? '#0B3D91' : '#8a8f98';
+    const bottomTabs = [
+      { key: 'home', label: L.navHome, iconHtml: iconWrap(ICONS.home, navColor('home')), color: navColor('home'), weight: screen === 'home' ? 700 : 400, onClick: () => this.go('home') },
+      { key: 'initiatives', label: L.navInitiatives, iconHtml: iconWrap(ICONS.initiatives, navColor('initiatives')), color: navColor('initiatives'), weight: screen === 'initiatives' ? 700 : 400, onClick: () => this.go('initiatives') },
+      { key: 'news', label: L.navNews, iconHtml: iconWrap(ICONS.news, navColor('news')), color: navColor('news'), weight: screen === 'news' ? 700 : 400, onClick: () => this.go('news') },
+      { key: 'complaint', label: L.navComplaint, iconHtml: iconWrap(ICONS.complaint, navColor('complaint')), color: navColor('complaint'), weight: screen === 'complaint' ? 700 : 400, onClick: () => this.go('complaint') },
+      { key: 'schemes', label: L.navSchemes, iconHtml: iconWrap(ICONS.schemes, navColor('schemes')), color: navColor('schemes'), weight: screen === 'schemes' ? 700 : 400, onClick: () => this.go('schemes') },
+    ];
+
+    const rawSlides = [
+      { img: 'slide-heritage.png', titleEn: 'Unity in Diversity', titleMr: 'विविधतेत एकता', descEn: 'Celebrating the shared heritage of all faiths', descMr: 'सर्व धर्मांच्या सामायिक वारशाचा उत्सव', placeholder: false },
+      { img: 'slide-education.jpg', titleEn: 'Learning Without Limits', titleMr: 'शिक्षणाला मर्यादा नाहीत', descEn: 'Scholarships opening doors for every student', descMr: 'प्रत्येक विद्यार्थ्यासाठी शिष्यवृत्तीच्या संधी', placeholder: false },
+      { img: 'slide-skill.jpg', titleEn: 'Building Livelihoods', titleMr: 'उपजीविकेची उभारणी', descEn: 'Training programs for self-reliance', descMr: 'स्वावलंबनासाठी प्रशिक्षण कार्यक्रम', placeholder: false },
+      { img: 'slide-welfare.jpg', titleEn: 'Support That Reaches You', titleMr: 'तुमच्यापर्यंत पोहोचणारे सहाय्य', descEn: 'Housing, health and financial assistance', descMr: 'घरकुल, आरोग्य व आर्थिक सहाय्य', placeholder: false },
+    ];
+    const slideIdx = this.state.slideIdx;
+    const slides = rawSlides.map((s, i) => ({ ...s, active: i === slideIdx, display: i === slideIdx ? 'block' : 'none' }));
+    const dots = rawSlides.map((s, i) => ({ key: i, active: i === slideIdx, onClick: () => this.goToSlide(i) }));
+
+    return {
+      isSplash: screen === 'splash',
+      showApp: this.state.showApp,
+      screen, lang, drawerOpen: this.state.drawerOpen, L, drawerItems, bottomTabs,
+      slides, dots, slideIdx: this.state.slideIdx, goToSlide: this.goToSlide,
+      go: this.go, toggleDrawer: this.toggleDrawer, toggleLang: this.toggleLang, noop: this.noop,
+      isHome: screen === 'home',
+      isAbout: screen === 'about',
+      isDocuments: screen === 'documents',
+      isInitiatives: screen === 'initiatives',
+      isSchemes: screen === 'schemes',
+      isPmScheme: screen === 'pmscheme',
+      isEducation: screen === 'education',
+      isNews: screen === 'news',
+      isProfile: screen === 'profile',
+      isComplaint: screen === 'complaint',
+      isFeedback: screen === 'feedback',
+    };
+  }
+}
+
+</script>
+</body>
+</html>

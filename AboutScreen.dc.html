@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div>
+  <div style="position:sticky;top:0;z-index:3;background:#fff;display:flex;align-items:center;gap:12px;padding:14px 16px;box-shadow:0 1px 0 rgba(11,61,145,0.08)">
+    <div onClick="{{ goHome }}" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:#F5F7FA">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    </div>
+    <div style="font-size:16px;font-weight:700;color:#14213d">{{ t.pageTitle }}</div>
+  </div>
+
+  <div style="padding:16px;display:flex;flex-direction:column;gap:16px">
+    <div style="width:100%;height:160px;border-radius:18px;overflow:hidden;position:relative;box-shadow:0 8px 24px rgba(11,61,145,0.18)">
+      <img src="about-building.jpg" alt="Department Building" style="width:100%;height:100%;object-fit:cover;display:block" />
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(11,20,40,0.45) 100%)"></div>
+    </div>
+
+    <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 14px rgba(11,61,145,0.08)">
+      <div style="font-size:14px;font-weight:700;color:#14213d;margin-bottom:8px">{{ t.pageTitle }}</div>
+      <div style="font-size:12.5px;line-height:1.7;color:#3c4043;font-family:'Noto Sans Devanagari','Roboto',sans-serif">{{ t.aboutText }}</div>
+    </div>
+
+    <div style="background:#fff;border-radius:16px;box-shadow:0 2px 14px rgba(11,61,145,0.08);overflow:hidden">
+      <div style="padding:16px 18px;border-bottom:1px solid #f0f2f5">
+        <div style="font-size:12px;font-weight:700;color:#FF9933;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">{{ t.visionTitle }}</div>
+        <div style="font-size:12.5px;line-height:1.6;color:#3c4043">{{ t.visionText }}</div>
+      </div>
+      <div style="padding:16px 18px">
+        <div style="font-size:12px;font-weight:700;color:#2E7D32;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">{{ t.missionTitle }}</div>
+        <div style="font-size:12.5px;line-height:1.6;color:#3c4043">{{ t.missionText }}</div>
+      </div>
+    </div>
+
+    <div style="background:#fff;border-radius:16px;box-shadow:0 2px 14px rgba(11,61,145,0.08)">
+      <sc-for list="{{ functions }}" as="f" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid #f5f6f8;cursor:pointer" style-hover="background:#F5F7FA">
+          <div style="font-size:13px;font-weight:500;color:#1a1a2e">{{ f }}</div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8a8f98" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- COMMISSION MEMBERS -->
+    <div>
+      <div style="font-size:12px;font-weight:700;color:#5f6368;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px">{{ t.membersHeading }}</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ leadership }}" as="m" hint-placeholder-count="2">
+          <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 4px 16px rgba(11,61,145,0.12);border:1.5px solid #FF9933;display:flex;align-items:center;gap:14px">
+            <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(145deg,#0B3D91,#1a5cc4);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;flex-shrink:0;box-shadow:0 4px 10px rgba(11,61,145,0.3)">{{ m.initials }}</div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <div style="font-size:13.5px;font-weight:700;color:#14213d">{{ m.name }}</div>
+                <div style="font-size:9px;font-weight:700;color:#fff;background:#FF9933;padding:2px 8px;border-radius:100px;letter-spacing:0.03em;text-transform:uppercase">{{ t.leadershipBadge }}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:5px;margin-top:4px">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+                <div style="font-size:11.5px;color:#0B3D91;font-weight:600">{{ m.designation }}</div>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+        <sc-for list="{{ members }}" as="m" hint-placeholder-count="9">
+          <div style="background:#fff;border-radius:14px;padding:13px 15px;box-shadow:0 2px 10px rgba(11,61,145,0.07);display:flex;align-items:center;gap:12px">
+            <div style="width:40px;height:40px;border-radius:50%;background:rgba(11,61,145,0.08);display:flex;align-items:center;justify-content:center;color:#0B3D91;font-weight:700;font-size:12.5px;flex-shrink:0">{{ m.initials }}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:12.5px;font-weight:600;color:#14213d">{{ m.name }}</div>
+              <div style="display:flex;align-items:center;gap:5px;margin-top:2px">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8a8f98" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+                <div style="font-size:10.5px;color:#8a8f98;font-weight:500">{{ m.designation }}</div>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- ADMINISTRATIVE STRUCTURE -->
+    <div>
+      <div style="font-size:12px;font-weight:700;color:#5f6368;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px">{{ t.structureHeading }}</div>
+      <div style="background:#fff;border-radius:16px;padding:20px 16px;box-shadow:0 2px 14px rgba(11,61,145,0.08);display:flex;flex-direction:column;align-items:center">
+        <sc-for list="{{ hierarchy }}" as="lvl" hint-placeholder-count="6">
+          <div style="display:flex;flex-direction:column;align-items:center;width:100%">
+            <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;width:100%">
+              <sc-for list="{{ lvl.nodes }}" as="node" hint-placeholder-count="2">
+                <div style="background:{{ node.bg }};color:{{ node.color }};border:1.5px solid {{ node.border }};border-radius:12px;padding:10px 16px;font-size:11.5px;font-weight:700;text-align:center;box-shadow:0 2px 8px rgba(11,61,145,0.08)">{{ node.label }}</div>
+              </sc-for>
+            </div>
+            <sc-if value="{{ lvl.hasNext }}" hint-placeholder-val="{{ false }}">
+              <div style="width:2px;height:18px;background:#c7d0dd"></div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="height:8px"></div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const MEMBERS_EN = {
+  leadership: [
+    { name: 'Shri. Pyare Jiya Khan', designation: 'Chairman', initials: 'PK' },
+    { name: 'Shri. Chetan Kheraj Dedhia', designation: 'Vice Chairman', initials: 'CD' },
+  ],
+  members: [
+    { name: 'Shri. Lalit Gandhi', designation: 'Member', initials: 'LG' },
+    { name: 'Shri. Charandeep Singh (Happy Singh)', designation: 'Member', initials: 'CS' },
+    { name: 'Shri. Ahmed Sharif Abdul Bashid Deshmukh', designation: 'Member', initials: 'AD' },
+    { name: 'Shri. Shaikh Washim', designation: 'Member', initials: 'SW' },
+    { name: 'Shri. Shaikh Gulam Rasool Gulam Hussain', designation: 'Member', initials: 'SG' },
+    { name: 'Shri. Sanjay Lalchandji Surana', designation: 'Member', initials: 'SS' },
+    { name: 'Shri. Afasar Shaikh', designation: 'Member', initials: 'AS' },
+    { name: 'Shri. Wasim Khwaja Bhai Burhan', designation: 'Member', initials: 'WB' },
+    { name: 'Shri. Hussain Babulal Shaikh', designation: 'Member', initials: 'HS' },
+  ],
+};
+
+const MEMBERS_MR = {
+  leadership: [
+    { name: 'श्री. प्यारे जिया खान', designation: 'अध्यक्ष', initials: 'PK' },
+    { name: 'श्री. चेतन खेराज देधिया', designation: 'उपाध्यक्ष', initials: 'CD' },
+  ],
+  members: [
+    { name: 'श्री. ललित गांधी', designation: 'सदस्य', initials: 'LG' },
+    { name: 'श्री. चरणदीप सिंग (हॅपी सिंग)', designation: 'सदस्य', initials: 'CS' },
+    { name: 'श्री. अहमद शरीफ अब्दुल बशीद देशमुख', designation: 'सदस्य', initials: 'AD' },
+    { name: 'श्री. शेख वसीम', designation: 'सदस्य', initials: 'SW' },
+    { name: 'श्री. शेख गुलाम रसूल गुलाम हुसेन', designation: 'सदस्य', initials: 'SG' },
+    { name: 'श्री. संजय लालचंदजी सुराणा', designation: 'सदस्य', initials: 'SS' },
+    { name: 'श्री. अफसर शेख', designation: 'सदस्य', initials: 'AS' },
+    { name: 'श्री. वसीम ख्वाजा भाई बुरहान', designation: 'सदस्य', initials: 'WB' },
+    { name: 'श्री. हुसेन बाबुलाल शेख', designation: 'सदस्य', initials: 'HS' },
+  ],
+};
+
+function buildHierarchy(labels, isMr) {
+  const navy = { bg: 'rgba(11,61,145,0.06)', color: '#0B3D91', border: 'rgba(11,61,145,0.25)' };
+  const saffron = { bg: 'rgba(255,153,51,0.1)', color: '#b9660b', border: 'rgba(255,153,51,0.4)' };
+  return [
+    { nodes: [{ label: labels.chairman, ...saffron }], hasNext: true },
+    { nodes: [{ label: labels.viceChairman, ...saffron }], hasNext: true },
+    { nodes: [{ label: labels.members, ...navy }], hasNext: true },
+    { nodes: [{ label: labels.secretary, ...navy }], hasNext: true },
+    { nodes: [
+      { label: labels.aao, ...navy }, { label: labels.steno, ...navy },
+      { label: labels.assistant, ...navy }, { label: labels.driver, ...navy },
+    ], hasNext: true },
+    { nodes: [{ label: labels.clerks, ...navy }], hasNext: true },
+    { nodes: [{ label: labels.peons, ...navy }], hasNext: false },
+  ];
+}
+
+const T = {
+  en: {
+    pageTitle: 'About the Department',
+    aboutText: 'The Minority Development Department (Minority Commission) works for the socio-economic development, welfare and protection of minority communities across Maharashtra through policy, schemes and grievance redressal.',
+    visionTitle: 'Vision', visionText: 'An empowered, self-reliant minority population contributing to the progress of Maharashtra.',
+    missionTitle: 'Mission', missionText: 'Ensure equitable access to education, employment and welfare for minority communities.',
+    functions: ['Objectives', 'Functions & Powers', 'Organisational Structure', 'Annual Report'],
+    membersHeading: 'Commission Members', leadershipBadge: 'Leadership',
+    structureHeading: 'Administrative Structure',
+    hierarchyLabels: { chairman: 'Chairman', viceChairman: 'Vice Chairman', members: 'Members', secretary: 'Secretary', aao: 'Asst. Accounting Officer', steno: 'Stenographer', assistant: 'Assistant', driver: 'Driver', clerks: 'Clerical Typists', peons: 'Peons' },
+    membersData: MEMBERS_EN,
+  },
+  mr: {
+    pageTitle: 'विभागाबद्दल',
+    aboutText: 'अल्पसंख्याक विकास विभाग (अल्पसंख्याक आयोग) धोरण, योजना आणि तक्रार निवारणाद्वारे महाराष्ट्रातील अल्पसंख्याक समुदायांच्या सामाजिक-आर्थिक विकासासाठी आणि कल्याणासाठी कार्य करतो.',
+    visionTitle: 'दृष्टी', visionText: 'महाराष्ट्राच्या प्रगतीत योगदान देणारी सक्षम, स्वयंपूर्ण अल्पसंख्याक लोकसंख्या.',
+    missionTitle: 'ध्येय', missionText: 'अल्पसंख्याक समुदायांना शिक्षण, रोजगार आणि कल्याणाचा समान प्रवेश सुनिश्चित करणे.',
+    functions: ['उद्दिष्टे', 'कार्ये व अधिकार', 'संघटनात्मक रचना', 'वार्षिक अहवाल'],
+    membersHeading: 'आयोगाचे सदस्य', leadershipBadge: 'नेतृत्व',
+    structureHeading: 'प्रशासकीय रचना',
+    hierarchyLabels: { chairman: 'अध्यक्ष', viceChairman: 'उपाध्यक्ष', members: 'सदस्य', secretary: 'सचिव', aao: 'सहायक लेखा अधिकारी', steno: 'लघुलेखक', assistant: 'सहायक', driver: 'चालक', clerks: 'लिपिक टंकलेखक', peons: 'शिपाई' },
+    membersData: MEMBERS_MR,
+  },
+};
+
+class Component extends DCLogic {
+  renderVals() {
+    const isMr = this.props.lang === 'mr';
+    const t = T[isMr ? 'mr' : 'en'];
+    return {
+      l: this.props.l || {}, t,
+      goHome: () => this.props.go && this.props.go('home'),
+      functions: t.functions,
+      leadership: t.membersData.leadership,
+      members: t.membersData.members,
+      hierarchy: buildHierarchy(t.hierarchyLabels, isMr),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

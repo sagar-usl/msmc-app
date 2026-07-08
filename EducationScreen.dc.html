@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div>
+  <div style="position:sticky;top:0;z-index:3;background:#fff;display:flex;align-items:center;gap:12px;padding:14px 16px;box-shadow:0 1px 0 rgba(11,61,145,0.08)">
+    <div onClick="{{ goHome }}" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:#F5F7FA">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    </div>
+    <div style="font-size:16px;font-weight:700;color:#14213d">{{ t.title }}</div>
+  </div>
+  <div style="padding:14px 16px 8px;display:flex;flex-direction:column;gap:10px">
+    <sc-for list="{{ items }}" as="it" hint-placeholder-count="5">
+      <div style="background:#fff;border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 8px rgba(11,61,145,0.06);cursor:pointer" style-hover="box-shadow:0 4px 14px rgba(11,61,145,0.14)">
+        <div style="width:42px;height:42px;border-radius:10px;background:rgba(11,61,145,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8l10-5 10 5-10 5-10-5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:#1a1a2e">{{ it.title }}</div>
+          <div style="font-size:11px;color:#8a8f98;margin-top:2px">{{ it.desc }}</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8a8f98" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+    </sc-for>
+    <div style="height:8px"></div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const T = {
+  en: {
+    title: 'Education & Scholarship',
+    items: [
+      { title: 'Pre-Matric Scholarship', desc: 'For students in classes 1-10' },
+      { title: 'Post-Matric Scholarship', desc: 'For undergraduate & postgraduate students' },
+      { title: 'Merit-cum-Means Scholarship', desc: 'For professional & technical courses' },
+      { title: 'NSP Scholarship', desc: 'Apply via National Scholarship Portal' },
+      { title: 'How to Apply', desc: 'Step-by-step application guide' },
+    ],
+  },
+  mr: {
+    title: 'शिक्षण व शिष्यवृत्ती',
+    items: [
+      { title: 'मॅट्रिकपूर्व शिष्यवृत्ती', desc: 'इयत्ता १ ते १० च्या विद्यार्थ्यांसाठी' },
+      { title: 'मॅट्रिकोत्तर शिष्यवृत्ती', desc: 'पदवी व पदव्युत्तर विद्यार्थ्यांसाठी' },
+      { title: 'गुणवत्ता-सह-गरजाधारित शिष्यवृत्ती', desc: 'व्यावसायिक व तांत्रिक अभ्यासक्रमांसाठी' },
+      { title: 'NSP शिष्यवृत्ती', desc: 'राष्ट्रीय शिष्यवृत्ती पोर्टलवर अर्ज करा' },
+      { title: 'अर्ज कसा करावा', desc: 'टप्प्याटप्प्याने अर्ज मार्गदर्शक' },
+    ],
+  },
+};
+
+class Component extends DCLogic {
+  renderVals() {
+    const t = T[this.props.lang === 'mr' ? 'mr' : 'en'];
+    return { l: this.props.l || {}, t, goHome: () => this.props.go && this.props.go('home'), items: t.items };
+  }
+}
+
+</script>
+</body>
+</html>

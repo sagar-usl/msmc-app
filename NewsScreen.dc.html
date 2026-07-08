@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div>
+  <div style="position:sticky;top:0;z-index:3;background:#fff;display:flex;align-items:center;gap:12px;padding:14px 16px;box-shadow:0 1px 0 rgba(11,61,145,0.08)">
+    <div style="font-size:17px;font-weight:700;color:#14213d">{{ t.title }}</div>
+  </div>
+  <div style="padding:14px 16px 8px;display:flex;flex-direction:column;gap:10px">
+    <sc-for list="{{ items }}" as="it" hint-placeholder-count="5">
+      <div style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 8px rgba(11,61,145,0.06)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <div style="font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:100px;background:{{ it.tagBg }};color:{{ it.tagColor }};text-transform:uppercase;letter-spacing:0.04em">{{ it.tag }}</div>
+          <div style="font-size:10.5px;color:#8a8f98">{{ it.date }}</div>
+        </div>
+        <div style="font-size:13.5px;font-weight:700;color:#14213d;line-height:1.35">{{ it.title }}</div>
+        <div style="font-size:11.5px;color:#5f6368;margin-top:4px;line-height:1.5">{{ it.snippet }}</div>
+      </div>
+    </sc-for>
+    <div style="height:8px"></div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const T = {
+  en: {
+    title: 'News',
+    items: [
+      { tag: 'Scheme Update', tagBg: 'rgba(11,61,145,0.1)', tagColor: '#0B3D91', date: '2 Jul 2026', title: 'Post-Matric Scholarship 2026-27 applications now open', snippet: 'Students can apply on the National Scholarship Portal until 30 Sept 2026.' },
+      { tag: 'Notice', tagBg: 'rgba(255,153,51,0.15)', tagColor: '#b9660b', date: '28 Jun 2026', title: 'Revised income eligibility limits for welfare schemes', snippet: 'Updated income criteria effective from the current financial year.' },
+      { tag: 'Event', tagBg: 'rgba(46,125,50,0.12)', tagColor: '#2E7D32', date: '20 Jun 2026', title: 'District awareness camps scheduled across Maharashtra', snippet: 'Camps to help citizens understand and apply for available schemes.' },
+      { tag: 'Notice', tagBg: 'rgba(255,153,51,0.15)', tagColor: '#b9660b', date: '10 Jun 2026', title: 'Helpline hours extended for grievance support', snippet: 'The commission helpline is now available 8 AM - 8 PM, all days.' },
+    ],
+  },
+  mr: {
+    title: 'बातम्या',
+    items: [
+      { tag: 'योजना अद्यतन', tagBg: 'rgba(11,61,145,0.1)', tagColor: '#0B3D91', date: '२ जुलै २०२६', title: 'मॅट्रिकोत्तर शिष्यवृत्ती २०२६-२७ साठी अर्ज सुरू', snippet: 'विद्यार्थी ३० सप्टेंबर २०२६ पर्यंत राष्ट्रीय शिष्यवृत्ती पोर्टलवर अर्ज करू शकतात.' },
+      { tag: 'सूचना', tagBg: 'rgba(255,153,51,0.15)', tagColor: '#b9660b', date: '२८ जून २०२६', title: 'कल्याण योजनांसाठी सुधारित उत्पन्न पात्रता मर्यादा', snippet: 'चालू आर्थिक वर्षापासून सुधारित उत्पन्न निकष लागू.' },
+      { tag: 'कार्यक्रम', tagBg: 'rgba(46,125,50,0.12)', tagColor: '#2E7D32', date: '२० जून २०२६', title: 'महाराष्ट्रभर जिल्हास्तरीय जनजागृती शिबिरे नियोजित', snippet: 'नागरिकांना योजना समजून घेण्यास व अर्ज करण्यास मदत करणारी शिबिरे.' },
+      { tag: 'सूचना', tagBg: 'rgba(255,153,51,0.15)', tagColor: '#b9660b', date: '१० जून २०२६', title: 'तक्रार सहाय्यासाठी हेल्पलाइन वेळ वाढवली', snweet: '' , snippet: 'आयोगाची हेल्पलाइन आता सकाळी ८ ते रात्री ८ पर्यंत उपलब्ध.' },
+    ],
+  },
+};
+
+class Component extends DCLogic {
+  renderVals() {
+    const t = T[this.props.lang === 'mr' ? 'mr' : 'en'];
+    return { l: this.props.l || {}, t, items: t.items };
+  }
+}
+
+</script>
+</body>
+</html>

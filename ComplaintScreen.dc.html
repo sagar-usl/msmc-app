@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div>
+
+  <!-- HEADER (shared shape across sub-views) -->
+  <div style="position:sticky;top:0;z-index:3;background:#fff;display:flex;align-items:center;gap:12px;padding:14px 16px;box-shadow:0 1px 0 rgba(11,61,145,0.08)">
+    <div onClick="{{ headerBack }}" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0" style-hover="background:#F5F7FA">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    </div>
+    <div style="font-size:16px;font-weight:700;color:#14213d;flex:1">{{ headerTitle }}</div>
+    <sc-if value="{{ isList }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ goNewComplaint }}" style="display:flex;align-items:center;gap:5px;background:#0B3D91;color:#fff;padding:8px 13px;border-radius:100px;font-size:11.5px;font-weight:700;cursor:pointer" style-hover="background:#082a66">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        {{ t.newBtn }}
+      </div>
+    </sc-if>
+  </div>
+
+  <!-- ============ VIEW: MY COMPLAINTS (LIST) ============ -->
+  <sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">
+    <div style="padding:14px 16px 8px;display:flex;flex-direction:column;gap:10px;animation:fadeIn 0.35s ease both">
+      <sc-for list="{{ complaints }}" as="c" hint-placeholder-count="3">
+        <div onClick="{{ c.onClick }}" style="background:#fff;border-radius:14px;padding:14px 15px;box-shadow:0 3px 14px rgba(11,61,145,0.09);cursor:pointer;display:flex;flex-direction:column;gap:8px" style-hover="box-shadow:0 6px 20px rgba(11,61,145,0.16)">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:13px;font-weight:700;color:#0B3D91">{{ c.id }}</div>
+            <div style="font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:100px;background:{{ c.statusBg }};color:{{ c.statusColor }};display:flex;align-items:center;gap:4px">
+              <div style="width:6px;height:6px;border-radius:50%;background:{{ c.statusColor }}"></div>{{ c.statusLabel }}
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:12px;color:#3c4043;font-weight:500">{{ c.categoryLabel }}</div>
+            <div style="font-size:10.5px;color:#8a8f98">{{ c.date }}</div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:flex-end;gap:3px;margin-top:2px">
+            <div style="font-size:11px;color:#0B3D91;font-weight:600">{{ t.viewDetails }}</div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+        </div>
+      </sc-for>
+      <div style="height:8px"></div>
+    </div>
+  </sc-if>
+
+  <!-- ============ VIEW: NEW COMPLAINT FORM ============ -->
+  <sc-if value="{{ isForm }}" hint-placeholder-val="{{ false }}">
+
+    <sc-if value="{{ submittedFlash }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:40px 24px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;animation:scaleIn 0.4s ease both">
+        <div style="width:64px;height:64px;border-radius:50%;background:rgba(46,125,50,0.12);display:flex;align-items:center;justify-content:center">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <div style="font-size:16px;font-weight:700;color:#14213d">{{ t.registeredTitle }}</div>
+        <div style="font-size:12.5px;color:#5f6368;line-height:1.6">{{ t.registeredSub }}</div>
+        <div style="background:#F5F7FA;border-radius:12px;padding:12px 20px;font-size:14px;font-weight:700;color:#0B3D91;letter-spacing:0.02em">{{ lastTicketId }}</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showFormFields }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:16px 16px 8px;display:flex;flex-direction:column;gap:16px;animation:fadeIn 0.35s ease both">
+        <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 12px rgba(11,61,145,0.08);display:flex;flex-direction:column;gap:14px">
+          <div style="font-size:13px;font-weight:700;color:#14213d">{{ t.formTitle }}</div>
+
+          <div>
+            <div style="font-size:11.5px;font-weight:600;color:#5f6368;margin-bottom:6px">{{ t.fullName }}</div>
+            <input value="{{ name }}" onChange="{{ onNameChange }}" placeholder="{{ t.fullNamePh }}" style="width:100%;border:1.5px solid {{ nameBorder }};border-radius:10px;padding:11px 13px;font-size:13px;font-family:inherit;outline:none;color:#14213d" />
+            <sc-if value="{{ errors.name }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;color:#c0392b;margin-top:4px">{{ t.errName }}</div></sc-if>
+          </div>
+
+          <div>
+            <div style="font-size:11.5px;font-weight:600;color:#5f6368;margin-bottom:6px">{{ t.mobileNumber }}</div>
+            <input value="{{ mobile }}" onChange="{{ onMobileChange }}" placeholder="{{ t.mobilePh }}" style="width:100%;border:1.5px solid {{ mobileBorder }};border-radius:10px;padding:11px 13px;font-size:13px;font-family:inherit;outline:none;color:#14213d" />
+            <sc-if value="{{ errors.mobile }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;color:#c0392b;margin-top:4px">{{ t.errMobile }}</div></sc-if>
+          </div>
+
+          <div>
+            <div style="font-size:11.5px;font-weight:600;color:#5f6368;margin-bottom:6px">{{ t.categoryLabel }}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <sc-for list="{{ categories }}" as="cat" hint-placeholder-count="5">
+                <div onClick="{{ cat.onClick }}" style="padding:8px 14px;border-radius:100px;font-size:11.5px;font-weight:600;cursor:pointer;background:{{ cat.bg }};color:{{ cat.color }};border:1.5px solid {{ cat.border }}">{{ cat.label }}</div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:11.5px;font-weight:600;color:#5f6368;margin-bottom:6px">{{ t.complaintDetails }}</div>
+            <textarea value="{{ description }}" onChange="{{ onDescChange }}" placeholder="{{ t.complaintDetailsPh }}" rows="4" style="width:100%;border:1.5px solid {{ descBorder }};border-radius:10px;padding:11px 13px;font-size:13px;font-family:inherit;outline:none;resize:none;color:#14213d"></textarea>
+            <sc-if value="{{ errors.description }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;color:#c0392b;margin-top:4px">{{ t.errDescription }}</div></sc-if>
+          </div>
+
+          <div>
+            <div style="font-size:11.5px;font-weight:600;color:#5f6368;margin-bottom:6px">{{ t.uploadDocs }}</div>
+            <label style="display:flex;align-items:center;gap:10px;border:1.5px dashed #b7c3dd;border-radius:10px;padding:13px;cursor:pointer;background:#F8FAFD" style-hover="background:#F0F4FA">
+              <div style="width:34px;height:34px;border-radius:9px;background:rgba(11,61,145,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg>
+              </div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:12px;font-weight:600;color:#0B3D91">{{ fileLabel }}</div>
+                <div style="font-size:10.5px;color:#8a8f98;margin-top:1px">{{ t.fileTypes }}</div>
+              </div>
+              <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange="{{ onFileChange }}" style="display:none" />
+            </label>
+          </div>
+
+          <div onClick="{{ submit }}" style="background:#FF9933;color:#fff;text-align:center;padding:13px;border-radius:12px;font-size:13.5px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(255,153,51,0.35)" style-hover="background:#e6851f">{{ t.submitBtn }}</div>
+        </div>
+        <div style="height:8px"></div>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <!-- ============ VIEW: COMPLAINT DETAILS ============ -->
+  <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:14px 16px 8px;display:flex;flex-direction:column;gap:14px;animation:fadeIn 0.35s ease both">
+
+      <div style="background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 2px 12px rgba(11,61,145,0.08);display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:14px;font-weight:700;color:#0B3D91">{{ selected.id }}</div>
+          <div style="font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:100px;background:{{ selected.statusBg }};color:{{ selected.statusColor }}">{{ selected.statusLabel }}</div>
+        </div>
+        <div style="height:1px;background:#f0f2f5"></div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;justify-content:space-between;font-size:12px"><div style="color:#8a8f98">{{ t.citizenName }}</div><div style="color:#14213d;font-weight:600">{{ selected.name }}</div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px"><div style="color:#8a8f98">{{ t.mobileNumber }}</div><div style="color:#14213d;font-weight:600">{{ selected.mobile }}</div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px"><div style="color:#8a8f98">{{ t.categoryLabel }}</div><div style="color:#14213d;font-weight:600">{{ selected.categoryLabel }}</div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px"><div style="color:#8a8f98">{{ t.submittedOn }}</div><div style="color:#14213d;font-weight:600">{{ selected.date }}</div></div>
+        </div>
+        <div style="height:1px;background:#f0f2f5"></div>
+        <div>
+          <div style="font-size:11px;font-weight:600;color:#5f6368;margin-bottom:4px">{{ t.descriptionLabel }}</div>
+          <div style="font-size:12.5px;line-height:1.6;color:#3c4043">{{ selected.description }}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:#F5F7FA;border-radius:10px;padding:10px 12px;margin-top:2px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/></svg>
+          <div style="font-size:11.5px;color:#14213d;font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ selected.fileName }}</div>
+        </div>
+      </div>
+
+      <!-- TIMELINE -->
+      <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 12px rgba(11,61,145,0.08)">
+        <div style="font-size:12px;font-weight:700;color:#5f6368;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:14px">{{ t.timelineHeading }}</div>
+        <sc-for list="{{ timeline }}" as="step" hint-placeholder-count="5">
+          <div style="display:flex;gap:12px">
+            <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
+              <div style="width:26px;height:26px;border-radius:50%;background:{{ step.dotBg }};display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:{{ step.dotShadow }}" dangerouslySetInnerHTML="{{ step.iconHtml }}"></div>
+              <div style="width:2px;flex:1;background:{{ step.lineColor }};display:{{ step.lineDisplay }};min-height:22px"></div>
+            </div>
+            <div style="padding-bottom:20px;flex:1">
+              <div style="font-size:12.5px;font-weight:700;color:{{ step.textColor }}">{{ step.label }}</div>
+              <sc-if value="{{ step.sub }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;color:#8a8f98;margin-top:2px">{{ step.sub }}</div></sc-if>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <!-- REJECTION REASON -->
+      <sc-if value="{{ isRejected }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 2px 12px rgba(11,61,145,0.08);border-left:3px solid #c0392b">
+          <div style="font-size:12px;font-weight:700;color:#c0392b;margin-bottom:5px">{{ t.rejectionReasonLabel }}</div>
+          <div style="font-size:12.5px;color:#3c4043;line-height:1.6">{{ selected.rejectionReason }}</div>
+        </div>
+      </sc-if>
+
+      <!-- DECISION ACTIONS (Under Review) -->
+      <sc-if value="{{ showDecisionActions }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 12px rgba(11,61,145,0.08);display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:12px;font-weight:700;color:#5f6368;text-transform:uppercase;letter-spacing:0.05em">{{ t.officerDecision }}</div>
+
+          <sc-if value="{{ showRejectForm }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <textarea value="{{ rejectReason }}" onChange="{{ onRejectReasonChange }}" placeholder="{{ t.rejectReasonPh }}" rows="3" style="width:100%;border:1.5px solid #dfe3e8;border-radius:10px;padding:11px 13px;font-size:12.5px;font-family:inherit;outline:none;resize:none;color:#14213d"></textarea>
+              <div style="display:flex;gap:8px">
+                <div onClick="{{ cancelReject }}" style="flex:1;text-align:center;padding:11px;border-radius:10px;font-size:12.5px;font-weight:600;color:#5f6368;background:#F5F7FA;cursor:pointer">{{ t.cancel }}</div>
+                <div onClick="{{ confirmReject }}" style="flex:1;text-align:center;padding:11px;border-radius:10px;font-size:12.5px;font-weight:700;color:#fff;background:#c0392b;cursor:pointer">{{ t.confirmRejection }}</div>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ showDecisionButtons }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;gap:10px">
+              <div onClick="{{ acceptComplaint }}" style="flex:1;text-align:center;padding:12px;border-radius:10px;font-size:12.5px;font-weight:700;color:#fff;background:#2E7D32;cursor:pointer" style-hover="background:#256428">{{ t.acceptComplaint }}</div>
+              <div onClick="{{ showReject }}" style="flex:1;text-align:center;padding:12px;border-radius:10px;font-size:12.5px;font-weight:700;color:#c0392b;background:#fff;border:1.5px solid #c0392b;cursor:pointer" style-hover="background:#fdf1f0">{{ t.rejectComplaint }}</div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- SCHEDULE HEARING -->
+      <sc-if value="{{ showScheduleHearingCard }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 12px rgba(11,61,145,0.08);display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:12px;font-weight:700;color:#5f6368;text-transform:uppercase;letter-spacing:0.05em">{{ t.scheduleHearing }}</div>
+          <div style="display:flex;gap:10px">
+            <div style="flex:1">
+              <div style="font-size:11px;font-weight:600;color:#5f6368;margin-bottom:5px">{{ t.hearingDateLabel }}</div>
+              <input type="date" value="{{ hearingDate }}" onChange="{{ onHearingDateChange }}" style="width:100%;border:1.5px solid #dfe3e8;border-radius:10px;padding:10px 11px;font-size:12px;font-family:inherit;outline:none;color:#14213d" />
+            </div>
+            <div style="flex:1">
+              <div style="font-size:11px;font-weight:600;color:#5f6368;margin-bottom:5px">{{ t.hearingTimeLabel }}</div>
+              <input type="time" value="{{ hearingTime }}" onChange="{{ onHearingTimeChange }}" style="width:100%;border:1.5px solid #dfe3e8;border-radius:10px;padding:10px 11px;font-size:12px;font-family:inherit;outline:none;color:#14213d" />
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:#5f6368;margin-bottom:5px">{{ t.hearingLocationLabel }}</div>
+            <input value="{{ hearingLocation }}" onChange="{{ onHearingLocationChange }}" placeholder="{{ t.hearingLocationPh }}" style="width:100%;border:1.5px solid #dfe3e8;border-radius:10px;padding:11px 13px;font-size:12.5px;font-family:inherit;outline:none;color:#14213d" />
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:#5f6368;margin-bottom:5px">{{ t.officerNameLabel }}</div>
+            <input value="{{ hearingOfficer }}" onChange="{{ onHearingOfficerChange }}" placeholder="{{ t.officerNamePh }}" style="width:100%;border:1.5px solid #dfe3e8;border-radius:10px;padding:11px 13px;font-size:12.5px;font-family:inherit;outline:none;color:#14213d" />
+          </div>
+          <sc-if value="{{ errors.hearing }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;color:#c0392b">{{ t.errHearing }}</div></sc-if>
+          <div onClick="{{ saveHearing }}" style="background:#0B3D91;color:#fff;text-align:center;padding:12px;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer" style-hover="background:#082a66">{{ t.saveHearing }}</div>
+        </div>
+      </sc-if>
+
+      <!-- HEARING INFO (once scheduled) -->
+      <sc-if value="{{ selected.hearing }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 2px 12px rgba(11,61,145,0.08)">
+          <div style="font-size:12px;font-weight:700;color:#5f6368;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px">{{ t.scheduledHearing }}</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;justify-content:space-between;font-size:12px"><div style="color:#8a8f98">{{ t.dateLabel }}</div><div style="color:#14213d;font-weight:600">{{ selected.hearing.date }}</div></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px"><div style="color:#8a8f98">{{ t.timeLabel }}</div><div style="color:#14213d;font-weight:600">{{ selected.hearing.time }}</div></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px"><div style="color:#8a8f98">{{ t.locationLabel }}</div><div style="color:#14213d;font-weight:600">{{ selected.hearing.location }}</div></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px"><div style="color:#8a8f98">{{ t.officerLabel }}</div><div style="color:#14213d;font-weight:600">{{ selected.hearing.officer }}</div></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- SCHEDULE FINAL HEARING -->
+      <sc-if value="{{ showScheduleFinalHearingCard }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 12px rgba(11,61,145,0.08);display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:12px;font-weight:700;color:#5f6368;text-transform:uppercase;letter-spacing:0.05em">{{ t.scheduleFinalHearing }}</div>
+          <div style="display:flex;gap:10px">
+            <div style="flex:1">
+              <div style="font-size:11px;font-weight:600;color:#5f6368;margin-bottom:5px">{{ t.hearingDateLabel }}</div>
+              <input type="date" value="{{ hearing2Date }}" onChange="{{ onHearing2DateChange }}" style="width:100%;border:1.5px solid #dfe3e8;border-radius:10px;padding:10px 11px;font-size:12px;font-family:inherit;outline:none;color:#14213d" />
+            </div>
+            <div style="flex:1">
+              <div style="font-size:11px;font-weight:600;color:#5f6368;margin-bottom:5px">{{ t.hearingTimeLabel }}</div>
+              <input type="time" value="{{ hearing2Time }}" onChange="{{ onHearing2TimeChange }}" style="width:100%;border:1.5px solid #dfe3e8;border-radius:10px;padding:10px 11px;font-size:12px;font-family:inherit;outline:none;color:#14213d" />
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:#5f6368;margin-bottom:5px">{{ t.hearingLocationLabel }}</div>
+            <input value="{{ hearing2Location }}" onChange="{{ onHearing2LocationChange }}" placeholder="{{ t.hearingLocationPh }}" style="width:100%;border:1.5px solid #dfe3e8;border-radius:10px;padding:11px 13px;font-size:12.5px;font-family:inherit;outline:none;color:#14213d" />
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:#5f6368;margin-bottom:5px">{{ t.officerNameLabel }}</div>
+            <input value="{{ hearing2Officer }}" onChange="{{ onHearing2OfficerChange }}" placeholder="{{ t.officerNamePh }}" style="width:100%;border:1.5px solid #dfe3e8;border-radius:10px;padding:11px 13px;font-size:12.5px;font-family:inherit;outline:none;color:#14213d" />
+          </div>
+          <sc-if value="{{ errors.hearing2 }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;color:#c0392b">{{ t.errHearing }}</div></sc-if>
+          <div onClick="{{ saveHearing2 }}" style="background:#0B3D91;color:#fff;text-align:center;padding:12px;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer" style-hover="background:#082a66">{{ t.saveFinalHearing }}</div>
+        </div>
+      </sc-if>
+
+      <!-- FINAL HEARING INFO (once scheduled) -->
+      <sc-if value="{{ selected.hearing2 }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 2px 12px rgba(11,61,145,0.08)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="font-size:12px;font-weight:700;color:#5f6368;text-transform:uppercase;letter-spacing:0.05em">{{ t.finalHearingInfo }}</div>
+            <div style="font-size:9.5px;font-weight:700;padding:3px 9px;border-radius:100px;background:{{ finalHearingStatusBg }};color:{{ finalHearingStatusColor }}">{{ finalHearingStatusLabel }}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;justify-content:space-between;font-size:12px"><div style="color:#8a8f98">{{ t.dateLabel }}</div><div style="color:#14213d;font-weight:600">{{ selected.hearing2.date }}</div></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px"><div style="color:#8a8f98">{{ t.timeLabel }}</div><div style="color:#14213d;font-weight:600">{{ selected.hearing2.time }}</div></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px"><div style="color:#8a8f98">{{ t.locationLabel }}</div><div style="color:#14213d;font-weight:600">{{ selected.hearing2.location }}</div></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px"><div style="color:#8a8f98">{{ t.officerLabel }}</div><div style="color:#14213d;font-weight:600">{{ selected.hearing2.officer }}</div></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- UPLOAD VERDICT -->
+      <sc-if value="{{ showUploadVerdict }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 12px rgba(11,61,145,0.08);display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:12px;font-weight:700;color:#5f6368;text-transform:uppercase;letter-spacing:0.05em">{{ t.uploadVerdictHeading }}</div>
+          <label style="display:flex;align-items:center;gap:10px;border:1.5px dashed #b7c3dd;border-radius:10px;padding:13px;cursor:pointer;background:#F8FAFD" style-hover="background:#F0F4FA">
+            <div style="width:34px;height:34px;border-radius:9px;background:rgba(11,61,145,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600;color:#0B3D91">{{ t.uploadVerdictDoc }}</div>
+              <div style="font-size:10.5px;color:#8a8f98;margin-top:1px">{{ t.pdfOnly }}</div>
+            </div>
+            <input type="file" accept=".pdf" onChange="{{ onVerdictUpload }}" style="display:none" />
+          </label>
+        </div>
+      </sc-if>
+
+      <!-- DOWNLOAD VERDICT (Disposed) -->
+      <sc-if value="{{ selected.verdictFile }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ noop }}" style="background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 2px 12px rgba(11,61,145,0.08);display:flex;align-items:center;gap:12px;cursor:pointer" style-hover="box-shadow:0 4px 16px rgba(11,61,145,0.14)">
+          <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,204,0,0.18);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a68b00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/></svg>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:12.5px;font-weight:600;color:#14213d">{{ selected.verdictFile }}</div>
+            <div style="font-size:10.5px;color:#8a8f98;margin-top:1px">{{ t.finalVerdictDoc }}</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13m0 0l-4-4m4 4l4-4"/><path d="M4 21h16"/></svg>
+        </div>
+      </sc-if>
+
+      <div style="height:8px"></div>
+    </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const CAT_KEYS = ['documents', 'education', 'schemeDelay', 'corruption', 'other'];
+const STATUS_KEYS = { UR: 'underReview', AC: 'accepted', RJ: 'rejected', CO: 'caseOnboard', DO: 'disposedOf' };
+const STATUS_STYLE = {
+  underReview: { bg: 'rgba(255,153,51,0.15)', color: '#b9660b' },
+  accepted: { bg: 'rgba(46,125,50,0.12)', color: '#2E7D32' },
+  rejected: { bg: 'rgba(192,57,43,0.12)', color: '#c0392b' },
+  caseOnboard: { bg: 'rgba(255,153,51,0.15)', color: '#b9660b' },
+  finalHearingScheduled: { bg: 'rgba(255,153,51,0.15)', color: '#b9660b' },
+  disposedOf: { bg: 'rgba(255,204,0,0.22)', color: '#a68b00' },
+};
+const ICON_CHECK = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+const ICON_DOT = '<div style="width:8px;height:8px;border-radius:50%;background:#fff"></div>';
+
+const SEED_EN = [
+  { id: 'CMP/2026/000131', name: 'Rahul Pathan', mobile: '9812345601', catKey: 'schemeDelay',
+    description: 'Scholarship amount for the last academic year has not yet been credited despite approval.',
+    fileName: 'bank_passbook.pdf', date: '05 Jul 2026', status: 'underReview', rejectionReason: null, hearing: null, verdictFile: null },
+  { id: 'CMP/2026/000119', name: 'Ayesha Sheikh', mobile: '9823456712', catKey: 'documents',
+    description: 'Domicile certificate submitted along with application appears to be missing from records.',
+    fileName: 'domicile_certificate.jpg', date: '28 Jun 2026', status: 'rejected',
+    rejectionReason: 'Duplicate complaint — an identical grievance (Ref: CMP/2026/000102) is already under process with the concerned district office.', hearing: null, verdictFile: null },
+  { id: 'CMP/2026/000108', name: 'Imran Qureshi', mobile: '9834567823', catKey: 'education',
+    description: 'Post-Matric scholarship application rejected without valid reason at college level.',
+    fileName: 'rejection_letter.pdf', date: '19 Jun 2026', status: 'caseOnboard', rejectionReason: null,
+    hearing: { date: '2026-07-18', time: '11:30', location: 'Divisional Commission Office, Nagpur', officer: 'Mrs. S. R. Kulkarni' }, hearing2: null, verdictFile: null },
+  { id: 'CMP/2026/000091', name: 'Fatima Ansari', mobile: '9845678934', catKey: 'corruption',
+    description: 'Alleged demand of unofficial payment for processing a welfare scheme application.',
+    fileName: 'complaint_evidence.pdf', date: '02 Jun 2026', status: 'disposedOf', rejectionReason: null,
+    hearing: { date: '2026-06-08', time: '10:00', location: 'District Collector Office, Pune', officer: 'Mr. A. V. Deshmukh' },
+    hearing2: { date: '2026-06-28', time: '11:00', location: 'State Minority Commission Office, Mumbai', officer: 'Mr. A. V. Deshmukh' },
+    verdictFile: 'final_verdict_CMP000091.pdf' },
+];
+
+const SEED_MR = [
+  { id: 'CMP/2026/000131', name: 'राहुल पठाण', mobile: '9812345601', catKey: 'schemeDelay',
+    description: 'मागील शैक्षणिक वर्षाची शिष्यवृत्ती रक्कम मंजुरी मिळूनही अद्याप जमा झालेली नाही.',
+    fileName: 'bank_passbook.pdf', date: '०५ जुलै २०२६', status: 'underReview', rejectionReason: null, hearing: null, verdictFile: null },
+  { id: 'CMP/2026/000119', name: 'आयेशा शेख', mobile: '9823456712', catKey: 'documents',
+    description: 'अर्जासोबत सादर केलेले अधिवास प्रमाणपत्र नोंदींमध्ये गहाळ असल्याचे दिसते.',
+    fileName: 'domicile_certificate.jpg', date: '२८ जून २०२६', status: 'rejected',
+    rejectionReason: 'दुबार तक्रार — तत्सम तक्रार (संदर्भ: CMP/2026/000102) आधीच संबंधित जिल्हा कार्यालयाकडे प्रक्रियेत आहे.', hearing: null, verdictFile: null },
+  { id: 'CMP/2026/000108', name: 'इम्रान कुरेशी', mobile: '9834567823', catKey: 'education',
+    description: 'महाविद्यालय स्तरावर वैध कारणाशिवाय मॅट्रिकोत्तर शिष्यवृत्ती अर्ज नाकारण्यात आला.',
+    fileName: 'rejection_letter.pdf', date: '१९ जून २०२६', status: 'caseOnboard', rejectionReason: null,
+    hearing: { date: '2026-07-18', time: '11:30', location: 'विभागीय आयुक्त कार्यालय, नागपूर', officer: 'श्रीमती एस. आर. कुलकर्णी' }, hearing2: null, verdictFile: null },
+  { id: 'CMP/2026/000091', name: 'फातिमा अन्सारी', mobile: '9845678934', catKey: 'corruption',
+    description: 'कल्याण योजना अर्ज प्रक्रियेसाठी अनधिकृत रकमेची मागणी केल्याचा आरोप.',
+    fileName: 'complaint_evidence.pdf', date: '०२ जून २०२६', status: 'disposedOf', rejectionReason: null,
+    hearing: { date: '2026-06-08', time: '10:00', location: 'जिल्हाधिकारी कार्यालय, पुणे', officer: 'श्री. ए. व्ही. देशमुख' },
+    hearing2: { date: '2026-06-28', time: '11:00', location: 'राज्य अल्पसंख्याक आयोग कार्यालय, मुंबई', officer: 'श्री. ए. व्ही. देशमुख' },
+    verdictFile: 'final_verdict_CMP000091.pdf' },
+];
+
+const T = {
+  en: {
+    newBtn: 'New', viewDetails: 'View Details',
+    headerList: 'My Complaints', headerForm: 'New Complaint', headerDetail: 'Complaint Details',
+    registeredTitle: 'Complaint Registered', registeredSub: 'Your complaint has been submitted successfully. Track its status in My Complaints.',
+    formTitle: 'Register a New Complaint',
+    fullName: 'Full Name', fullNamePh: 'Enter your name', errName: 'Please enter your name',
+    mobileNumber: 'Mobile Number', mobilePh: '10-digit mobile number', errMobile: 'Enter a valid 10-digit mobile number',
+    categoryLabel: 'Category',
+    catLabels: { documents: 'Documents', education: 'Education', schemeDelay: 'Scheme Delay', corruption: 'Corruption', other: 'Other' },
+    complaintDetails: 'Complaint Details', complaintDetailsPh: 'Describe your complaint in detail', errDescription: 'Please describe your complaint (min. 10 characters)',
+    uploadDocs: 'Upload Supporting Documents', fileTypes: 'PDF, JPG or PNG', fileDefault: 'Tap to upload a file',
+    submitBtn: 'Submit Complaint',
+    citizenName: 'Citizen Name', submittedOn: 'Submitted On', descriptionLabel: 'Complaint Description',
+    timelineHeading: 'Case Progress Timeline',
+    rejectionReasonLabel: 'Reason for Rejection',
+    officerDecision: 'Officer Decision', rejectReasonPh: 'Enter reason for rejection',
+    cancel: 'Cancel', confirmRejection: 'Confirm Rejection', acceptComplaint: 'Accept Complaint', rejectComplaint: 'Reject Complaint',
+    scheduleHearing: 'Schedule Hearing', hearingDateLabel: 'Hearing Date', hearingTimeLabel: 'Hearing Time',
+    hearingLocationLabel: 'Hearing Location', hearingLocationPh: 'e.g. Commission Office, Mumbai',
+    officerNameLabel: 'Officer Name', officerNamePh: 'Enter officer name', errHearing: 'Please fill in all hearing details',
+    saveHearing: 'Save & Schedule Hearing',
+    scheduledHearing: 'Scheduled Hearing', dateLabel: 'Date', timeLabel: 'Time', locationLabel: 'Location', officerLabel: 'Officer',
+    uploadVerdictHeading: 'Upload Verdict', uploadVerdictDoc: 'Upload Verdict Document', pdfOnly: 'PDF only',
+    finalVerdictDoc: 'Final Verdict Document',
+    scheduleFinalHearing: 'Schedule Final Hearing', saveFinalHearing: 'Save & Schedule Final Hearing',
+    finalHearingInfo: 'Final Hearing', upcomingLabel: 'Upcoming', completedLabel: 'Completed',
+    statusLabels: { underReview: 'Under Review', accepted: 'Accepted', rejected: 'Rejected', caseOnboard: 'Case Onboard', finalHearingScheduled: 'Final Hearing Scheduled', disposedOf: 'Disposed Of' },
+    tl: { submitted: 'Complaint Submitted', underReview: 'Under Review', rejected: 'Rejected', closed: 'Complaint closed', accepted: 'Accepted', hearingScheduled: 'Hearing Scheduled (First Hearing)', caseOnboard: 'Case Onboard', finalHearingScheduled: 'Hearing Scheduled (Final Hearing)', verdictUploaded: 'Verdict Uploaded', disposedOf: 'Disposed Of' },
+    todayLabel: 'Today', noDocLabel: 'No document attached',
+    seed: SEED_EN,
+  },
+  mr: {
+    newBtn: 'नवीन', viewDetails: 'तपशील पहा',
+    headerList: 'माझ्या तक्रारी', headerForm: 'नवीन तक्रार', headerDetail: 'तक्रार तपशील',
+    registeredTitle: 'तक्रार नोंदवली गेली', registeredSub: 'तुमची तक्रार यशस्वीरित्या सबमिट झाली आहे. माझ्या तक्रारींमध्ये स्थिती पहा.',
+    formTitle: 'नवीन तक्रार नोंदवा',
+    fullName: 'पूर्ण नाव', fullNamePh: 'तुमचे नाव प्रविष्ट करा', errName: 'कृपया तुमचे नाव प्रविष्ट करा',
+    mobileNumber: 'मोबाईल क्रमांक', mobilePh: '१०-अंकी मोबाईल क्रमांक', errMobile: 'वैध १०-अंकी मोबाईल क्रमांक प्रविष्ट करा',
+    categoryLabel: 'प्रकार',
+    catLabels: { documents: 'दस्तऐवज', education: 'शिक्षण', schemeDelay: 'योजना विलंब', corruption: 'भ्रष्टाचार', other: 'इतर' },
+    complaintDetails: 'तक्रारीचा तपशील', complaintDetailsPh: 'तुमची तक्रार सविस्तर वर्णन करा', errDescription: 'कृपया तुमची तक्रार वर्णन करा (किमान १० अक्षरे)',
+    uploadDocs: 'सहाय्यक दस्तऐवज अपलोड करा', fileTypes: 'PDF, JPG किंवा PNG', fileDefault: 'फाइल अपलोड करण्यासाठी टॅप करा',
+    submitBtn: 'तक्रार सबमिट करा',
+    citizenName: 'नागरिकाचे नाव', submittedOn: 'सादर केल्याची तारीख', descriptionLabel: 'तक्रारीचे वर्णन',
+    timelineHeading: 'प्रकरण प्रगती कालरेषा',
+    rejectionReasonLabel: 'नकाराचे कारण',
+    officerDecision: 'अधिकाऱ्याचा निर्णय', rejectReasonPh: 'नकाराचे कारण प्रविष्ट करा',
+    cancel: 'रद्द करा', confirmRejection: 'नकार निश्चित करा', acceptComplaint: 'तक्रार स्वीकारा', rejectComplaint: 'तक्रार नाकारा',
+    scheduleHearing: 'सुनावणी नियोजित करा', hearingDateLabel: 'सुनावणी तारीख', hearingTimeLabel: 'सुनावणी वेळ',
+    hearingLocationLabel: 'सुनावणी ठिकाण', hearingLocationPh: 'उदा. आयोग कार्यालय, मुंबई',
+    officerNameLabel: 'अधिकाऱ्याचे नाव', officerNamePh: 'अधिकाऱ्याचे नाव प्रविष्ट करा', errHearing: 'कृपया सर्व सुनावणी तपशील भरा',
+    saveHearing: 'जतन करा व सुनावणी नियोजित करा',
+    scheduledHearing: 'नियोजित सुनावणी', dateLabel: 'तारीख', timeLabel: 'वेळ', locationLabel: 'ठिकाण', officerLabel: 'अधिकारी',
+    uploadVerdictHeading: 'निकाल अपलोड करा', uploadVerdictDoc: 'निकाल दस्तऐवज अपलोड करा', pdfOnly: 'फक्त PDF',
+    finalVerdictDoc: 'अंतिम निकाल दस्तऐवज',
+    scheduleFinalHearing: 'अंतिम सुनावणी निश्चित करा', saveFinalHearing: 'जतन करा व अंतिम सुनावणी निश्चित करा',
+    finalHearingInfo: 'अंतिम सुनावणी', upcomingLabel: 'आगामी', completedLabel: 'पूर्ण झाले',
+    statusLabels: { underReview: 'विचाराधीन', accepted: 'स्वीकृत', rejected: 'नाकारले', caseOnboard: 'प्रकरण दाखल', finalHearingScheduled: 'अंतिम सुनावणी निश्चित', disposedOf: 'निकाली' },
+    tl: { submitted: 'तक्रार सादर केली', underReview: 'विचाराधीन', rejected: 'नाकारले', closed: 'तक्रार बंद', accepted: 'स्वीकृत', hearingScheduled: 'सुनावणी नियोजित (पहिली सुनावणी)', caseOnboard: 'प्रकरण दाखल', finalHearingScheduled: 'सुनावणी नियोजित (अंतिम सुनावणी)', verdictUploaded: 'निकाल अपलोड केला', disposedOf: 'निकाली' },
+    todayLabel: 'आज', noDocLabel: 'कोणताही दस्तऐवज संलग्न नाही',
+    seed: SEED_MR,
+  },
+};
+
+class Component extends DCLogic {
+  state = {
+    view: 'list', selectedId: null,
+    complaintsEn: SEED_EN.map(c => ({ ...c })), complaintsMr: SEED_MR.map(c => ({ ...c })),
+    name: '', mobile: '', catKey: 'documents', description: '', fileName: '', errors: {},
+    submittedFlash: false, lastTicketId: '',
+    showRejectForm: false, rejectReason: '',
+    hearingDate: '', hearingTime: '', hearingLocation: '', hearingOfficer: '',
+    hearing2Date: '', hearing2Time: '', hearing2Location: '', hearing2Officer: '',
+  };
+
+  goList = () => this.setState({ view: 'list', submittedFlash: false });
+  goNewComplaint = () => this.setState({
+    view: 'form', submittedFlash: false,
+    name: '', mobile: '', catKey: 'documents', description: '', fileName: '', errors: {},
+  });
+  goDetail = (id) => this.setState({ view: 'detail', selectedId: id, showRejectForm: false, rejectReason: '', hearingDate: '', hearingTime: '', hearingLocation: '', hearingOfficer: '', hearing2Date: '', hearing2Time: '', hearing2Location: '', hearing2Officer: '' });
+  headerBack = () => {
+    const v = this.state.view;
+    if (v === 'detail') this.goList();
+    else if (v === 'form') this.goList();
+    else this.props.go && this.props.go('home');
+  };
+
+  setField = (field, val) => this.setState(s => ({ [field]: val, errors: { ...s.errors, [field]: null } }));
+  setCategory = (c) => this.setState({ catKey: c });
+  onFileChange = (e) => { const f = e.target.files && e.target.files[0]; if (f) this.setState({ fileName: f.name }); };
+
+  submit = () => {
+    const { name, mobile, description, catKey, fileName } = this.state;
+    const t = T[this.props.lang === 'mr' ? 'mr' : 'en'];
+    const errors = {};
+    if (!name.trim()) errors.name = true;
+    if (!/^[0-9]{10}$/.test(mobile.trim())) errors.mobile = true;
+    if (!description.trim() || description.trim().length < 10) errors.description = true;
+    if (Object.keys(errors).length) { this.setState({ errors }); return; }
+    const ticketId = 'CMP/2026/' + String(Math.floor(100000 + Math.random() * 899999)).slice(0, 6);
+    const base = { id: ticketId, name, mobile, catKey, description, fileName: fileName || t.noDocLabel, date: t.todayLabel, status: 'underReview', rejectionReason: null, hearing: null, verdictFile: null };
+    this.setState(s => ({
+      complaintsEn: [{ ...base }, ...s.complaintsEn],
+      complaintsMr: [{ ...base }, ...s.complaintsMr],
+      submittedFlash: true, lastTicketId: ticketId,
+    }));
+    setTimeout(() => this.setState({ view: 'list', submittedFlash: false }), 1400);
+  };
+
+  updateSelected = (patch) => {
+    this.setState(s => ({
+      complaintsEn: s.complaintsEn.map(c => c.id === s.selectedId ? { ...c, ...patch } : c),
+      complaintsMr: s.complaintsMr.map(c => c.id === s.selectedId ? { ...c, ...patch } : c),
+    }));
+  };
+
+  acceptComplaint = () => this.updateSelected({ status: 'accepted' });
+  showReject = () => this.setState({ showRejectForm: true });
+  cancelReject = () => this.setState({ showRejectForm: false, rejectReason: '' });
+  confirmReject = () => {
+    if (!this.state.rejectReason.trim()) return;
+    this.updateSelected({ status: 'rejected', rejectionReason: this.state.rejectReason });
+    this.setState({ showRejectForm: false });
+  };
+
+  saveHearing = () => {
+    const { hearingDate, hearingTime, hearingLocation, hearingOfficer } = this.state;
+    if (!hearingDate || !hearingTime || !hearingLocation.trim() || !hearingOfficer.trim()) {
+      this.setState(s => ({ errors: { ...s.errors, hearing: true } }));
+      return;
+    }
+    this.updateSelected({ status: 'caseOnboard', hearing: { date: hearingDate, time: hearingTime, location: hearingLocation, officer: hearingOfficer } });
+    this.setState(s => ({ errors: { ...s.errors, hearing: null } }));
+  };
+
+  saveHearing2 = () => {
+    const { hearing2Date, hearing2Time, hearing2Location, hearing2Officer } = this.state;
+    if (!hearing2Date || !hearing2Time || !hearing2Location.trim() || !hearing2Officer.trim()) {
+      this.setState(s => ({ errors: { ...s.errors, hearing2: true } }));
+      return;
+    }
+    this.updateSelected({ status: 'finalHearingScheduled', hearing2: { date: hearing2Date, time: hearing2Time, location: hearing2Location, officer: hearing2Officer } });
+    this.setState(s => ({ errors: { ...s.errors, hearing2: null } }));
+  };
+
+  onVerdictUpload = (e) => {
+    const f = e.target.files && e.target.files[0];
+    const name = f ? f.name : ('verdict_' + this.state.selectedId.replace(/\//g, '') + '.pdf');
+    this.updateSelected({ status: 'disposedOf', verdictFile: name });
+  };
+
+  noop = () => {};
+
+  buildTimeline = (c, t) => {
+    const steps = [];
+    const done = { icon: ICON_CHECK, bg: '#2E7D32' };
+    const current = (color) => ({ icon: ICON_DOT, bg: color });
+    const pending = { icon: '', bg: '#e2e6ec' };
+
+    const push = (label, sub, kind, color) => {
+      const st = kind === 'done' ? done : kind === 'current' ? current(color) : pending;
+      steps.push({
+        label, sub,
+        iconHtml: { __html: st.icon },
+        dotBg: st.bg,
+        dotShadow: kind === 'current' ? `0 0 0 4px ${color}33` : 'none',
+        textColor: kind === 'pending' ? '#b5bac2' : '#14213d',
+        lineColor: kind === 'pending' ? '#eceff3' : '#c7d0dd',
+      });
+    };
+
+    push(t.tl.submitted, c.date, 'done');
+
+    if (c.status === 'rejected') {
+      push(t.tl.underReview, null, 'done');
+      push(t.tl.rejected, t.tl.closed, 'current', '#c0392b');
+      steps[steps.length - 1].lineColor = '#eceff3';
+      steps[steps.length - 1].lineDisplay = 'none';
+      return steps;
+    }
+
+    const order = ['underReview', 'accepted', 'caseOnboard', 'finalHearingScheduled', 'disposedOf'];
+    const idx = order.indexOf(c.status);
+
+    push(t.tl.underReview, null, idx > 0 ? 'done' : (idx === 0 ? 'current' : 'pending'), '#b9660b');
+    push(t.tl.accepted, null, idx > 1 ? 'done' : (idx === 1 ? 'current' : 'pending'), '#2E7D32');
+    push(t.tl.hearingScheduled, c.hearing ? (c.hearing.date + ' · ' + c.hearing.location) : null, c.hearing ? 'done' : 'pending', '#0B3D91');
+    push(t.tl.caseOnboard, null, idx > 2 ? 'done' : (idx === 2 ? 'current' : 'pending'), '#b9660b');
+    push(t.tl.finalHearingScheduled, c.hearing2 ? (c.hearing2.date + ' · ' + c.hearing2.location) : null, c.hearing2 ? 'done' : 'pending', '#0B3D91');
+    push(t.tl.verdictUploaded, c.verdictFile || null, c.verdictFile ? 'done' : 'pending', '#0B3D91');
+    push(t.tl.disposedOf, null, idx === 4 ? 'current' : 'pending', '#a68b00');
+    steps[steps.length - 1].lineDisplay = 'none';
+
+    return steps;
+  };
+
+  renderVals() {
+    const s = this.state;
+    const isMr = this.props.lang === 'mr';
+    const t = T[isMr ? 'mr' : 'en'];
+    const view = s.view;
+    const rawList = isMr ? s.complaintsMr : s.complaintsEn;
+
+    const complaints = rawList.map(c => {
+      const st = STATUS_STYLE[c.status] || { bg: '#eee', color: '#666' };
+      return { ...c, statusBg: st.bg, statusColor: st.color, statusLabel: t.statusLabels[c.status], categoryLabel: t.catLabels[c.catKey], onClick: () => this.goDetail(c.id) };
+    });
+
+    const selectedRaw = rawList.find(c => c.id === s.selectedId) || rawList[0] || {};
+    const selSt = STATUS_STYLE[selectedRaw.status] || { bg: '#eee', color: '#666' };
+    const selected = { ...selectedRaw, statusBg: selSt.bg, statusColor: selSt.color, statusLabel: t.statusLabels[selectedRaw.status], categoryLabel: t.catLabels[selectedRaw.catKey] };
+
+    const timeline = view === 'detail' ? this.buildTimeline(selectedRaw, t) : [];
+
+    const categories = CAT_KEYS.map(k => ({
+      key: k, label: t.catLabels[k], onClick: () => this.setCategory(k),
+      bg: s.catKey === k ? '#0B3D91' : '#fff',
+      color: s.catKey === k ? '#fff' : '#5f6368',
+      border: s.catKey === k ? '#0B3D91' : '#dfe3e8',
+    }));
+
+    return {
+      l: this.props.l || {}, t,
+      isList: view === 'list', isForm: view === 'form', isDetail: view === 'detail',
+      headerTitle: view === 'list' ? t.headerList : view === 'form' ? t.headerForm : t.headerDetail,
+      headerBack: this.headerBack,
+      goNewComplaint: this.goNewComplaint,
+      complaints, selected,
+      showFormFields: !s.submittedFlash, submittedFlash: s.submittedFlash, lastTicketId: s.lastTicketId,
+      name: s.name, mobile: s.mobile, description: s.description, errors: s.errors,
+      fileLabel: s.fileName || t.fileDefault,
+      onNameChange: (e) => this.setField('name', e.target.value),
+      onMobileChange: (e) => this.setField('mobile', e.target.value.replace(/[^0-9]/g, '').slice(0, 10)),
+      onDescChange: (e) => this.setField('description', e.target.value),
+      onFileChange: this.onFileChange,
+      nameBorder: s.errors.name ? '#c0392b' : '#dfe3e8',
+      mobileBorder: s.errors.mobile ? '#c0392b' : '#dfe3e8',
+      descBorder: s.errors.description ? '#c0392b' : '#dfe3e8',
+      categories, submit: this.submit,
+      timeline,
+      isRejected: selectedRaw.status === 'rejected',
+      showDecisionActions: selectedRaw.status === 'underReview',
+      showDecisionButtons: !s.showRejectForm,
+      showRejectForm: s.showRejectForm, rejectReason: s.rejectReason,
+      onRejectReasonChange: (e) => this.setState({ rejectReason: e.target.value }),
+      showReject: this.showReject, cancelReject: this.cancelReject, confirmReject: this.confirmReject,
+      acceptComplaint: this.acceptComplaint,
+      showScheduleHearingCard: selectedRaw.status === 'accepted' && !selectedRaw.hearing,
+      hearingDate: s.hearingDate, hearingTime: s.hearingTime, hearingLocation: s.hearingLocation, hearingOfficer: s.hearingOfficer,
+      onHearingDateChange: (e) => this.setState({ hearingDate: e.target.value }),
+      onHearingTimeChange: (e) => this.setState({ hearingTime: e.target.value }),
+      onHearingLocationChange: (e) => this.setState({ hearingLocation: e.target.value }),
+      onHearingOfficerChange: (e) => this.setState({ hearingOfficer: e.target.value }),
+      saveHearing: this.saveHearing,
+      showScheduleFinalHearingCard: selectedRaw.status === 'caseOnboard' && !selectedRaw.hearing2,
+      hearing2Date: s.hearing2Date, hearing2Time: s.hearing2Time, hearing2Location: s.hearing2Location, hearing2Officer: s.hearing2Officer,
+      onHearing2DateChange: (e) => this.setState({ hearing2Date: e.target.value }),
+      onHearing2TimeChange: (e) => this.setState({ hearing2Time: e.target.value }),
+      onHearing2LocationChange: (e) => this.setState({ hearing2Location: e.target.value }),
+      onHearing2OfficerChange: (e) => this.setState({ hearing2Officer: e.target.value }),
+      saveHearing2: this.saveHearing2,
+      finalHearingStatusLabel: selectedRaw.status === 'finalHearingScheduled' ? t.upcomingLabel : (selectedRaw.verdictFile ? t.completedLabel : t.upcomingLabel),
+      finalHearingStatusBg: (selectedRaw.verdictFile) ? 'rgba(46,125,50,0.12)' : 'rgba(255,153,51,0.15)',
+      finalHearingStatusColor: (selectedRaw.verdictFile) ? '#2E7D32' : '#b9660b',
+      showUploadVerdict: selectedRaw.status === 'finalHearingScheduled' && !selectedRaw.verdictFile,
+      onVerdictUpload: this.onVerdictUpload,
+      noop: this.noop,
+    };
+  }
+}
+
+</script>
+</body>
+</html>

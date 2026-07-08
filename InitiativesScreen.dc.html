@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div>
+  <div style="position:sticky;top:0;z-index:3;background:#fff;display:flex;align-items:center;gap:12px;padding:14px 16px;box-shadow:0 1px 0 rgba(11,61,145,0.08)">
+    <div onClick="{{ goHome }}" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:#F5F7FA">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    </div>
+    <div style="font-size:16px;font-weight:700;color:#14213d">{{ t.title }}</div>
+  </div>
+  <div style="padding:14px 16px 8px;display:flex;flex-direction:column;gap:12px">
+    <sc-for list="{{ items }}" as="it" hint-placeholder-count="4">
+      <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(11,61,145,0.14)">
+        <div style="position:relative;height:100px;overflow:hidden">
+          <img src="{{ it.img }}" alt="{{ it.title }}" style="width:100%;height:100%;object-fit:cover;display:block" />
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,0.32) 100%)"></div>
+        </div>
+        <div style="padding:14px 15px 15px">
+          <div style="font-size:13.5px;font-weight:700;color:#14213d">{{ it.title }}</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:5px">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <div style="font-size:11px;font-weight:600;color:#5f6368">{{ it.district }}</div>
+          </div>
+          <div style="font-size:11.5px;color:#5f6368;margin-top:6px;line-height:1.5">{{ it.desc }}</div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const T = {
+  en: {
+    title: 'Initiatives',
+    items: [
+      { title: 'Skill Development Program', district: 'Sambhaji Nagar', desc: 'Vocational training and job placement support for minority youth.', img: 'init-skill.jpg' },
+      { title: 'Women Empowerment Cell', district: 'Nashik', desc: 'Micro-credit, self-help groups and entrepreneurship support for women.', img: 'init-women.jpg' },
+      { title: 'Youth Development Mission', district: 'Beed', desc: 'Career counselling, competitive exam coaching and mentorship.', img: 'init-youth.jpg' },
+      { title: 'Community Outreach Drives', district: 'Bhandara', desc: 'District-level camps to raise awareness of schemes and entitlements.', img: 'init-community.jpg' },
+    ],
+  },
+  mr: {
+    title: 'उपक्रम',
+    items: [
+      { title: 'कौशल्य विकास कार्यक्रम', district: 'संभाजी नगर', desc: 'अल्पसंख्याक युवकांसाठी व्यावसायिक प्रशिक्षण व रोजगार सहाय्य.', img: 'init-skill.jpg' },
+      { title: 'महिला सक्षमीकरण कक्ष', district: 'नाशिक', desc: 'महिलांसाठी सूक्ष्म-कर्ज, बचत गट व उद्योजकता सहाय्य.', img: 'init-women.jpg' },
+      { title: 'युवा विकास मिशन', district: 'बीड', desc: 'करिअर मार्गदर्शन, स्पर्धा परीक्षा प्रशिक्षण व मार्गदर्शन.', img: 'init-youth.jpg' },
+      { title: 'सामुदायिक जनजागृती मोहीम', district: 'भंडारा', desc: 'योजना व हक्कांबाबत जनजागृतीसाठी जिल्हास्तरीय शिबिरे.', img: 'init-community.jpg' },
+    ],
+  },
+};
+
+class Component extends DCLogic {
+  renderVals() {
+    const t = T[this.props.lang === 'mr' ? 'mr' : 'en'];
+    return { l: this.props.l || {}, t, goHome: () => this.props.go && this.props.go('home'), items: t.items };
+  }
+}
+
+</script>
+</body>
+</html>

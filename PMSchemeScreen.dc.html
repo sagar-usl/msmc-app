@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div>
+  <div style="position:sticky;top:0;z-index:3;background:#fff;display:flex;align-items:center;gap:12px;padding:14px 16px;box-shadow:0 1px 0 rgba(11,61,145,0.08)">
+    <div onClick="{{ goSchemes }}" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0" style-hover="background:#F5F7FA">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    </div>
+    <div style="font-size:15px;font-weight:700;color:#14213d;line-height:1.2">{{ t.headerTitle }}</div>
+  </div>
+
+  <div style="padding:14px 16px 8px;display:flex;flex-direction:column;gap:16px">
+
+    <!-- HERO -->
+    <div style="position:relative;border-radius:18px;overflow:hidden;background:linear-gradient(135deg,#0B3D91,#1a5cc4);padding:22px 18px;box-shadow:0 8px 24px rgba(11,61,145,0.2)">
+      <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(135deg,rgba(255,255,255,0.07) 0 3px,transparent 3px 22px)"></div>
+      <div style="position:absolute;top:-20px;right:-20px;width:110px;height:110px;border-radius:50%;background:rgba(255,153,51,0.18)"></div>
+      <div style="position:relative;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF9933" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+          </div>
+          <div style="font-size:10px;font-weight:700;color:#FFC876;letter-spacing:0.06em;text-transform:uppercase">{{ t.eyebrow }}</div>
+        </div>
+        <div style="font-size:19px;font-weight:800;color:#fff;line-height:1.3">{{ t.heroTitle }}</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.5">{{ t.heroSub }}</div>
+      </div>
+    </div>
+
+    <!-- INTRO CARD -->
+    <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 12px rgba(11,61,145,0.08);display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.7" r="0.9" fill="#0B3D91" stroke="none"/></svg>
+        <div style="font-size:12px;font-weight:700;color:#0B3D91;text-transform:uppercase;letter-spacing:0.05em">{{ t.aboutTitle }}</div>
+      </div>
+      <div style="font-size:12.5px;line-height:1.7;color:#3c4043">{{ t.aboutText1 }}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <sc-for list="{{ communities }}" as="comm" hint-placeholder-count="6">
+          <div style="padding:6px 12px;border-radius:100px;background:#F5F7FA;color:#0B3D91;font-size:11.5px;font-weight:600">{{ comm }}</div>
+        </sc-for>
+      </div>
+      <div style="font-size:12.5px;line-height:1.7;color:#3c4043;margin-top:2px">{{ t.aboutText2 }}</div>
+    </div>
+
+    <!-- 15 POINTS ACCORDION -->
+    <div>
+      <div style="font-size:12px;font-weight:700;color:#5f6368;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px">{{ t.pointsHeading }}</div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <sc-for list="{{ points }}" as="p" hint-placeholder-count="15">
+          <div style="background:#fff;border-radius:14px;box-shadow:0 2px 10px rgba(11,61,145,0.07);overflow:hidden">
+            <div onClick="{{ p.onToggle }}" style="display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer" style-hover="background:#FAFBFC">
+              <div style="width:28px;height:28px;border-radius:50%;background:{{ p.numBg }};color:{{ p.numColor }};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">{{ p.num }}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:12.5px;font-weight:700;color:#14213d;line-height:1.35">{{ p.title }}</div>
+                <sc-if value="{{ p.collapsedSummary }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:11px;color:#8a8f98;margin-top:3px;line-height:1.5">{{ p.collapsedSummary }}</div>
+                </sc-if>
+              </div>
+              <div style="flex-shrink:0;transform:{{ p.chevronRotate }};transition:transform 0.2s ease">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+              </div>
+            </div>
+            <sc-if value="{{ p.expanded }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:0 14px 15px 54px;font-size:12px;line-height:1.65;color:#3c4043;animation:fadeIn 0.25s ease both">{{ p.detail }}</div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- OFFICIAL DOCUMENT -->
+    <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 12px rgba(11,61,145,0.08);display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:13px;font-weight:700;color:#14213d">{{ t.docTitle }}</div>
+      <div style="font-size:12px;line-height:1.6;color:#5f6368">{{ t.docDesc }}</div>
+      <div onClick="{{ noop }}" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#0B3D91;color:#fff;padding:13px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer" style-hover="background:#082a66">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13m0 0l-4-4m4 4l4-4"/><path d="M4 21h16"/></svg>
+        {{ t.downloadBtn }}
+        <span style="font-size:10.5px;font-weight:500;opacity:0.75">· 2.8 MB</span>
+      </div>
+    </div>
+
+    <!-- QUICK FACTS -->
+    <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 12px rgba(11,61,145,0.08);display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:12px;font-weight:700;color:#5f6368;text-transform:uppercase;letter-spacing:0.05em">{{ t.quickFacts }}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:#F5F7FA;border-radius:12px;padding:12px">
+          <div style="font-size:10px;color:#8a8f98;font-weight:600;text-transform:uppercase">{{ t.beneficiaries }}</div>
+          <div style="font-size:12.5px;font-weight:700;color:#0B3D91;margin-top:3px">{{ t.beneficiariesVal }}</div>
+        </div>
+        <div style="background:#F5F7FA;border-radius:12px;padding:12px">
+          <div style="font-size:10px;color:#8a8f98;font-weight:600;text-transform:uppercase">{{ t.programme }}</div>
+          <div style="font-size:12.5px;font-weight:700;color:#0B3D91;margin-top:3px">{{ t.programmeVal }}</div>
+        </div>
+        <div style="background:#F5F7FA;border-radius:12px;padding:12px;grid-column:1/-1">
+          <div style="font-size:10px;color:#8a8f98;font-weight:600;text-transform:uppercase">{{ t.type }}</div>
+          <div style="font-size:12.5px;font-weight:700;color:#0B3D91;margin-top:3px">{{ t.typeVal }}</div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:#8a8f98;font-weight:600;text-transform:uppercase;margin-top:2px">{{ t.focusAreas }}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <sc-for list="{{ focusAreas }}" as="fa" hint-placeholder-count="6">
+          <div style="padding:6px 12px;border-radius:100px;background:rgba(255,153,51,0.12);color:#b9660b;font-size:11px;font-weight:600">{{ fa }}</div>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- NEED ASSISTANCE -->
+    <div style="background:linear-gradient(135deg,#0B3D91,#082a66);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:13px;font-weight:700;color:#fff">{{ t.needAssistance }}</div>
+      <div style="font-size:12px;line-height:1.6;color:rgba(255,255,255,0.75)">{{ t.needAssistanceSub }}</div>
+      <div style="display:flex;gap:8px">
+        <div onClick="{{ noop }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;background:rgba(255,255,255,0.12);border-radius:12px;padding:11px 6px;cursor:pointer" style-hover="background:rgba(255,255,255,0.2)">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          <div style="font-size:10.5px;font-weight:600;color:#fff">{{ t.call }}</div>
+        </div>
+        <div onClick="{{ noop }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;background:rgba(255,255,255,0.12);border-radius:12px;padding:11px 6px;cursor:pointer" style-hover="background:rgba(255,255,255,0.2)">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 6l8 7 8-7"/></svg>
+          <div style="font-size:10.5px;font-weight:600;color:#fff">{{ t.email }}</div>
+        </div>
+        <div onClick="{{ noop }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;background:rgba(255,255,255,0.12);border-radius:12px;padding:11px 6px;cursor:pointer" style-hover="background:rgba(255,255,255,0.2)">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <div style="font-size:10.5px;font-weight:600;color:#fff">{{ t.visitOffice }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:8px"></div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const POINTS_EN = [
+  { title: 'Enhancing Educational Opportunities', collapsedSummary: 'Wider access to schools and higher education for minority students.', detail: 'Government works to expand school and college access in minority-concentrated areas, improve enrolment and reduce drop-out rates through targeted support.' },
+  { title: 'Improving Availability of Early Childhood Education', collapsedSummary: 'More Anganwadi centres in minority-concentrated areas.', detail: 'Priority is given to opening Anganwadi centres under ICDS in areas with significant minority population to strengthen early childhood care and education.' },
+  { title: 'Promotion of Urdu Education', collapsedSummary: 'Recruitment of Urdu teachers and learning resources.', detail: 'States are encouraged to appoint sufficient Urdu-language teachers and make Urdu-medium textbooks and resources available where there is demand.' },
+  { title: 'Modernisation of Madrasa Education', collapsedSummary: 'Support to introduce modern subjects in madrasas.', detail: 'Financial assistance is provided to madrasas willing to introduce science, mathematics, English and social studies alongside religious education.' },
+  { title: 'Scholarships for Minority Students', collapsedSummary: 'Pre-Matric, Post-Matric and Merit-cum-Means scholarships.', detail: 'A structured scholarship framework supports minority students from school through professional and technical education, reducing financial barriers to learning.' },
+  { title: 'Strengthening Maulana Azad Education Foundation', collapsedSummary: 'Expanding grants for educational infrastructure.', detail: 'The Foundation\u2019s corpus and outreach are strengthened to fund school buildings, hostels and other educational infrastructure for minority communities.' },
+  { title: 'Equal Participation in Employment and Self Employment', collapsedSummary: 'Skill-linked employment and business support.', detail: 'Programmes promote fair access to jobs and encourage self-employment through training, mentorship and easier access to government job information.' },
+  { title: 'Skill Development and Vocational Training', collapsedSummary: 'Trade-based training for youth employability.', detail: 'Vocational training centres offer industry-relevant skill courses to improve employability and support placement of minority youth.' },
+  { title: 'Access to Credit and Financial Inclusion', collapsedSummary: 'Concessional loans via National Minorities Development Corporation.', detail: 'Concessional credit, micro-financing and financial literacy support help minority entrepreneurs and families access banking and credit facilities.' },
+  { title: 'Fair Representation in Government Employment', collapsedSummary: 'Encouraging representation in police and public services.', detail: 'States are encouraged to ensure fair representation of minorities in recruitment to state police forces and other public services.' },
+  { title: 'Equal Share in Rural Housing Schemes', collapsedSummary: 'Fair allocation under rural housing programmes.', detail: 'Minority households are ensured a fair and proportionate share of benefits under rural housing schemes such as Pradhan Mantri Awaas Yojana - Gramin.' },
+  { title: 'Improvement of Living Conditions in Minority Areas', collapsedSummary: 'Basic amenities under the Multi-sectoral Development Programme.', detail: 'Minority Concentration Areas receive focused infrastructure investment covering drinking water, roads, healthcare and sanitation facilities.' },
+  { title: 'Preventing Communal Violence', collapsedSummary: 'Preventive measures in communally sensitive areas.', detail: 'District administrations identify communally sensitive areas and take preventive measures, including deployment of additional forces during tension.' },
+  { title: 'Speedy Justice in Communal Violence Cases', collapsedSummary: 'Fast-track courts for timely trials.', detail: 'Cases relating to communal violence are prioritised for prompt investigation and trial, including through fast-track courts where required.' },
+  { title: 'Rehabilitation of Victims of Communal Violence', collapsedSummary: 'Relief, compensation and resettlement support.', detail: 'Victims of communal violence receive financial relief, compensation and support for resettlement and rebuilding of livelihoods.' },
+];
+
+const POINTS_MR = [
+  { title: 'शैक्षणिक संधींचा विस्तार', collapsedSummary: 'अल्पसंख्याक विद्यार्थ्यांसाठी शाळा व उच्च शिक्षणाचा व्यापक प्रवेश.', detail: 'अल्पसंख्याकबहुल भागात शाळा व महाविद्यालय प्रवेश वाढवणे, नोंदणी सुधारणे आणि गळतीचे प्रमाण कमी करण्यासाठी शासन विशेष सहाय्य पुरवते.' },
+  { title: 'बालवाडी शिक्षणाची उपलब्धता सुधारणे', collapsedSummary: 'अल्पसंख्याकबहुल भागात अधिक अंगणवाडी केंद्रे.', detail: 'लक्षणीय अल्पसंख्याक लोकसंख्या असलेल्या भागात ICDS अंतर्गत अंगणवाडी केंद्रे सुरू करण्यास प्राधान्य दिले जाते.' },
+  { title: 'उर्दू शिक्षणाला प्रोत्साहन', collapsedSummary: 'उर्दू शिक्षकांची भरती व शिक्षण साहित्य.', detail: 'मागणीनुसार राज्यांना पुरेसे उर्दू शिक्षक नेमण्यास व उर्दू माध्यमाची पाठ्यपुस्तके उपलब्ध करून देण्यास प्रोत्साहित केले जाते.' },
+  { title: 'मदरसा शिक्षणाचे आधुनिकीकरण', collapsedSummary: 'मदरशांमध्ये आधुनिक विषय सुरू करण्यास सहाय्य.', detail: 'धार्मिक शिक्षणासोबत विज्ञान, गणित, इंग्रजी व सामाजिक शास्त्रे शिकवू इच्छिणाऱ्या मदरशांना आर्थिक सहाय्य दिले जाते.' },
+  { title: 'अल्पसंख्याक विद्यार्थ्यांसाठी शिष्यवृत्ती', collapsedSummary: 'मॅट्रिकपूर्व, मॅट्रिकोत्तर व गुणवत्ता-सह-गरजाधारित शिष्यवृत्ती.', detail: 'शालेय ते व्यावसायिक व तांत्रिक शिक्षणापर्यंत संरचित शिष्यवृत्ती चौकट अल्पसंख्याक विद्यार्थ्यांना आर्थिक अडथळे कमी करण्यास मदत करते.' },
+  { title: 'मौलाना आझाद शिक्षण प्रतिष्ठानचे बळकटीकरण', collapsedSummary: 'शैक्षणिक पायाभूत सुविधांसाठी अनुदान विस्तार.', detail: 'प्रतिष्ठानचा निधी व व्याप्ती वाढवून शाळा इमारती, वसतिगृहे व इतर शैक्षणिक पायाभूत सुविधांना निधी दिला जातो.' },
+  { title: 'रोजगार व स्वयंरोजगारात समान सहभाग', collapsedSummary: 'कौशल्याधारित रोजगार व व्यवसाय सहाय्य.', detail: 'प्रशिक्षण, मार्गदर्शन आणि शासकीय नोकरीच्या माहितीच्या सुलभ प्रवेशाद्वारे रोजगार व स्वयंरोजगारास प्रोत्साहन दिले जाते.' },
+  { title: 'कौशल्य विकास व व्यावसायिक प्रशिक्षण', collapsedSummary: 'युवकांच्या रोजगारक्षमतेसाठी व्यवसायाधारित प्रशिक्षण.', detail: 'व्यावसायिक प्रशिक्षण केंद्रे उद्योगाशी सुसंगत कौशल्य अभ्यासक्रम देऊन अल्पसंख्याक युवकांची रोजगारक्षमता व नियुक्ती सुधारतात.' },
+  { title: 'पतपुरवठा व आर्थिक समावेशन', collapsedSummary: 'राष्ट्रीय अल्पसंख्याक विकास महामंडळामार्फत सवलतीचे कर्ज.', detail: 'सवलतीचे कर्ज, सूक्ष्म-वित्तपुरवठा व आर्थिक साक्षरता सहाय्य अल्पसंख्याक उद्योजक व कुटुंबांना बँकिंग व कर्ज सुविधांपर्यंत पोहोचण्यास मदत करते.' },
+  { title: 'शासकीय नोकऱ्यांमध्ये न्याय्य प्रतिनिधित्व', collapsedSummary: 'पोलीस व सार्वजनिक सेवांमध्ये प्रतिनिधित्वास प्रोत्साहन.', detail: 'राज्य पोलीस दल व इतर सार्वजनिक सेवांच्या भरतीत अल्पसंख्याकांना न्याय्य प्रतिनिधित्व मिळावे यासाठी राज्यांना प्रोत्साहित केले जाते.' },
+  { title: 'ग्रामीण गृहनिर्माण योजनांमध्ये समान वाटा', collapsedSummary: 'ग्रामीण गृहनिर्माण कार्यक्रमांतर्गत न्याय्य वाटप.', detail: 'प्रधानमंत्री आवास योजना - ग्रामीण सारख्या ग्रामीण गृहनिर्माण योजनांतर्गत अल्पसंख्याक कुटुंबांना न्याय्य व प्रमाणबद्ध लाभ सुनिश्चित केला जातो.' },
+  { title: 'अल्पसंख्याकबहुल भागातील राहणीमान सुधारणा', collapsedSummary: 'बहुक्षेत्रीय विकास कार्यक्रमांतर्गत मूलभूत सुविधा.', detail: 'अल्पसंख्याक बहुल क्षेत्रांना पिण्याचे पाणी, रस्ते, आरोग्यसेवा व स्वच्छता सुविधांसह केंद्रित पायाभूत सुविधा गुंतवणूक मिळते.' },
+  { title: 'जातीय हिंसाचार रोखणे', collapsedSummary: 'संवेदनशील भागात प्रतिबंधात्मक उपाययोजना.', detail: 'जिल्हा प्रशासन जातीयदृष्ट्या संवेदनशील भाग ओळखून तणावाच्या काळात अतिरिक्त दलांच्या तैनातीसह प्रतिबंधात्मक उपाययोजना करते.' },
+  { title: 'जातीय हिंसाचार प्रकरणांत जलद न्याय', collapsedSummary: 'वेळेवर सुनावणीसाठी जलदगती न्यायालये.', detail: 'जातीय हिंसाचाराशी संबंधित प्रकरणांना तातडीने तपास व खटला चालवण्यास प्राधान्य दिले जाते, आवश्यक तेथे जलदगती न्यायालयांद्वारे.' },
+  { title: 'जातीय हिंसाचार पीडितांचे पुनर्वसन', collapsedSummary: 'मदत, नुकसानभरपाई व पुनर्वसन सहाय्य.', detail: 'जातीय हिंसाचाराच्या पीडितांना आर्थिक मदत, नुकसानभरपाई आणि पुनर्वसन व उपजीविका पुनर्बांधणीसाठी सहाय्य दिले जाते.' },
+];
+
+const T = {
+  en: {
+    headerTitle: '15 Point Programme', eyebrow: 'Government of India Initiative',
+    heroTitle: "Prime Minister's New 15 Point Programme", heroSub: 'for the Welfare of Minorities',
+    aboutTitle: 'About the Programme',
+    aboutText1: "Prime Minister Narendra Modi's New 15 Point Programme for the Welfare of Minorities is a Government of India initiative that aims to ensure equal opportunities and better access to education, employment, housing, skill development, financial inclusion and welfare schemes for the six officially notified minority communities:",
+    aboutText2: 'The programme focuses on inclusive development and equitable participation in Government schemes.',
+    communities: ['Muslims', 'Christians', 'Sikhs', 'Buddhists', 'Parsis', 'Jains'],
+    pointsHeading: 'The 15 Programme Points',
+    docTitle: 'Official Programme Document',
+    docDesc: 'Read the complete Government document containing detailed guidelines and explanations of all 15 programme points.',
+    downloadBtn: 'Download Full PDF',
+    quickFacts: 'Quick Facts',
+    beneficiaries: 'Beneficiaries', beneficiariesVal: '6 Minority Communities',
+    programme: 'Programme', programmeVal: '15 Point Programme',
+    type: 'Type', typeVal: 'Government of India Initiative',
+    focusAreas: 'Focus Areas',
+    focusAreasList: ['Education', 'Employment', 'Skill Development', 'Housing', 'Financial Inclusion', 'Social Justice'],
+    needAssistance: 'Need Assistance?',
+    needAssistanceSub: 'Need help understanding the scheme? Contact the Maharashtra State Minority Commission for assistance.',
+    call: 'Call', email: 'Email', visitOffice: 'Visit Office',
+    points: POINTS_EN,
+  },
+  mr: {
+    headerTitle: '१५ कलमी कार्यक्रम', eyebrow: 'भारत सरकारचा उपक्रम',
+    heroTitle: 'पंतप्रधानांचा नवीन १५ कलमी कार्यक्रम', heroSub: 'अल्पसंख्याकांच्या कल्याणासाठी',
+    aboutTitle: 'कार्यक्रमाबद्दल',
+    aboutText1: 'पंतप्रधान नरेंद्र मोदी यांचा अल्पसंख्याकांच्या कल्याणासाठी नवीन १५ कलमी कार्यक्रम हा भारत सरकारचा उपक्रम आहे, ज्याचा उद्देश सहा अधिकृतरित्या अधिसूचित अल्पसंख्याक समुदायांना शिक्षण, रोजगार, गृहनिर्माण, कौशल्य विकास, आर्थिक समावेशन व कल्याण योजनांमध्ये समान संधी व चांगला प्रवेश सुनिश्चित करणे हा आहे:',
+    aboutText2: 'हा कार्यक्रम सर्वसमावेशक विकास आणि शासकीय योजनांमधील न्याय्य सहभागावर लक्ष केंद्रित करतो.',
+    communities: ['मुस्लिम', 'ख्रिश्चन', 'शीख', 'बौद्ध', 'पारशी', 'जैन'],
+    pointsHeading: '१५ कार्यक्रम मुद्दे',
+    docTitle: 'अधिकृत कार्यक्रम दस्तऐवज',
+    docDesc: 'सर्व १५ कार्यक्रम मुद्द्यांचे तपशीलवार मार्गदर्शन व स्पष्टीकरण असलेला संपूर्ण शासकीय दस्तऐवज वाचा.',
+    downloadBtn: 'संपूर्ण PDF डाउनलोड करा',
+    quickFacts: 'ठळक माहिती',
+    beneficiaries: 'लाभार्थी', beneficiariesVal: '६ अल्पसंख्याक समुदाय',
+    programme: 'कार्यक्रम', programmeVal: '१५ कलमी कार्यक्रम',
+    type: 'प्रकार', typeVal: 'भारत सरकारचा उपक्रम',
+    focusAreas: 'केंद्रित क्षेत्रे',
+    focusAreasList: ['शिक्षण', 'रोजगार', 'कौशल्य विकास', 'गृहनिर्माण', 'आर्थिक समावेशन', 'सामाजिक न्याय'],
+    needAssistance: 'सहाय्य हवे आहे?',
+    needAssistanceSub: 'योजना समजून घेण्यास मदत हवी आहे? सहाय्यासाठी महाराष्ट्र राज्य अल्पसंख्याक आयोगाशी संपर्क साधा.',
+    call: 'कॉल करा', email: 'ईमेल', visitOffice: 'कार्यालयास भेट द्या',
+    points: POINTS_MR,
+  },
+};
+
+class Component extends DCLogic {
+  state = { expanded: {} };
+  toggle = (i) => this.setState(s => ({ expanded: { ...s.expanded, [i]: !s.expanded[i] } }));
+  noop = () => {};
+
+  renderVals() {
+    const t = T[this.props.lang === 'mr' ? 'mr' : 'en'];
+    const exp = this.state.expanded;
+    const points = t.points.map((p, i) => ({
+      num: i + 1, title: p.title, detail: p.detail,
+      expanded: !!exp[i],
+      collapsedSummary: exp[i] ? null : p.collapsedSummary,
+      numBg: exp[i] ? '#0B3D91' : 'rgba(11,61,145,0.08)',
+      numColor: exp[i] ? '#fff' : '#0B3D91',
+      chevronRotate: exp[i] ? 'rotate(180deg)' : 'rotate(0deg)',
+      onToggle: () => this.toggle(i),
+    }));
+    return {
+      l: this.props.l || {}, t,
+      goSchemes: () => this.props.go && this.props.go('schemes'),
+      communities: t.communities,
+      focusAreas: t.focusAreasList,
+      points, noop: this.noop,
+    };
+  }
+}
+
+</script>
+</body>
+</html>
