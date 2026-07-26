@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:14-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: msmc
+      POSTGRES_USER: msmc
+      POSTGRES_PASSWORD: msmc
+    ports:
+      - "5433:5432"
+    volumes:
+      - msmc_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  msmc_postgres_data:
