@@ -97,7 +97,12 @@
   },
   "profile": {
     "title": "प्रोफाइल",
-    "logout": "लॉगआऊट"
+    "logout": "लॉगआऊट",
+    "setupTitle": "तुमचे प्रोफाइल सेट करा",
+    "setupSubtitle": "तक्रारींचा मागोवा घेण्यासाठी तुमचे नाव व मोबाईल क्रमांक जोडा.",
+    "setupAction": "सेट करा",
+    "citizenFallback": "नागरिक",
+    "loggedOut": "लॉगआऊट झाले."
   },
   "complaint": {
     "newBtn": "नवीन",

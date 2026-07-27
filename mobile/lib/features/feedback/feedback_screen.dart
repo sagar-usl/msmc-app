@@ -1,8 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/network/api_exception.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/screen_header.dart';
+import 'data/feedback_repository.dart';
 
 class FeedbackScreen extends StatefulWidget {
   const FeedbackScreen({super.key});
@@ -12,12 +14,15 @@ class FeedbackScreen extends StatefulWidget {
 }
 
 class _FeedbackScreenState extends State<FeedbackScreen> {
+  final _repo = const FeedbackRepository();
   final _nameController = TextEditingController();
   final _messageController = TextEditingController();
   int _rating = 0;
   bool _ratingError = false;
   bool _messageError = false;
   bool _submitted = false;
+  bool _isSubmitting = false;
+  String? _serverError;
 
   @override
   void dispose() {
@@ -26,14 +31,37 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     final message = _messageController.text.trim();
     setState(() {
       _ratingError = _rating == 0;
       _messageError = message.length < 5;
+      _serverError = null;
     });
     if (_ratingError || _messageError) return;
-    setState(() => _submitted = true);
+
+    setState(() => _isSubmitting = true);
+    try {
+      await _repo.submitFeedback(
+        rating: _rating,
+        name: _nameController.text.trim(),
+        message: message,
+      );
+      setState(() {
+        _submitted = true;
+        _isSubmitting = false;
+      });
+    } on ApiException catch (e) {
+      setState(() {
+        _serverError = e.userMessage;
+        _isSubmitting = false;
+      });
+    } catch (e) {
+      setState(() {
+        _serverError = 'An unexpected error occurred.';
+        _isSubmitting = false;
+      });
+    }
   }
 
   void _reset() {
@@ -44,6 +72,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       _ratingError = false;
       _messageError = false;
       _submitted = false;
+      _serverError = null;
     });
   }
 
@@ -147,18 +176,24 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   errorText: _messageError ? 'feedback.messageError'.tr() : null,
                 ),
               ),
+              if (_serverError != null) ...[
+                const SizedBox(height: 10),
+                Text(_serverError!, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, color: AppColors.red)),
+              ],
               const SizedBox(height: 14),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _submit,
+                  onPressed: _isSubmitting ? null : _submit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.navy,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 13),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: Text('feedback.submitBtn'.tr(), style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700)),
+                  child: _isSubmitting
+                      ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : Text('feedback.submitBtn'.tr(), style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700)),
                 ),
               ),
             ],

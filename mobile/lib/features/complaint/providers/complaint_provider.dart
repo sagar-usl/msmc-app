@@ -1,85 +1,76 @@
-import 'package:flutter_riverpod/legacy.dart';
-import '../../../core/localization/bi.dart';
-import '../data/complaint_models.dart';
-import '../data/complaint_seed.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/storage/secure_storage.dart';
+import '../data/complaint_api_models.dart';
+import '../data/complaint_repository.dart';
 
-/// Citizen-vs-officer view toggle. In the real backend (Phase 4 of the build
-/// plan) this becomes a real `role` claim on the JWT gated by
-/// `requireRole('officer')`; for now it's a local dev switch so the same
-/// screen can be exercised both ways, mirroring what the prototype fakes
-/// entirely client-side.
-final isOfficerModeProvider = StateProvider<bool>((ref) => false);
+final _repo = const ComplaintRepository();
 
-final complaintListProvider = StateNotifierProvider<ComplaintNotifier, List<Complaint>>((ref) {
-  return ComplaintNotifier();
-});
+/// Provider that exposes the current citizen's mobile (null = not onboarded yet).
+final citizenMobileProvider = FutureProvider<String?>((ref) => SecureStorage.instance.getMobile());
 
-class ComplaintNotifier extends StateNotifier<List<Complaint>> {
-  ComplaintNotifier() : super(seedComplaints());
+/// Provider that exposes the current citizen's saved name (null = not onboarded yet).
+final citizenNameProvider = FutureProvider<String?>((ref) => SecureStorage.instance.getName());
 
-  String _generateTicketId() {
-    final n = 100000 + DateTime.now().microsecondsSinceEpoch % 899999;
-    return 'CMP/2026/$n';
+/// Complaint list — loaded once the mobile is known.
+final complaintListProvider =
+    AsyncNotifierProvider<ComplaintListNotifier, List<ComplaintSummary>>(ComplaintListNotifier.new);
+
+class ComplaintListNotifier extends AsyncNotifier<List<ComplaintSummary>> {
+  @override
+  Future<List<ComplaintSummary>> build() async {
+    final mobile = await SecureStorage.instance.getMobile();
+    if (mobile == null) return [];
+    return _repo.fetchMyComplaints(mobile);
   }
 
-  /// Returns the new ticket id.
-  String submit({
-    required String name,
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final mobile = await SecureStorage.instance.getMobile();
+      if (mobile == null) return <ComplaintSummary>[];
+      return _repo.fetchMyComplaints(mobile);
+    });
+  }
+
+  /// Submit a complaint and refresh the list. Returns the new ticketId.
+  Future<String> submit({
+    required String fullName,
     required String mobile,
-    required ComplaintCategory category,
+    required String category,
     required String description,
-    String? fileName,
-  }) {
-    final id = _generateTicketId();
-    final complaint = Complaint(
-      id: id,
-      name: Bi(name, name),
+  }) async {
+    final ticketId = await _repo.submitComplaint(
+      fullName: fullName,
       mobile: mobile,
       category: category,
-      description: Bi(description, description),
-      fileName: fileName ?? '',
-      date: const Bi('Today', 'आज'),
-      status: ComplaintStatus.underReview,
+      description: description,
     );
-    state = [complaint, ...state];
-    return id;
+    await refresh();
+    return ticketId;
+  }
+}
+
+/// Per-complaint detail provider (family keyed by ticketId).
+final complaintDetailProvider =
+    AsyncNotifierProvider.family<ComplaintDetailNotifier, ComplaintDetail, String>(
+  ComplaintDetailNotifier.new,
+);
+
+class ComplaintDetailNotifier extends AsyncNotifier<ComplaintDetail> {
+  ComplaintDetailNotifier(this.ticketId);
+  final String ticketId;
+
+  Future<ComplaintDetail> _fetch() async {
+    final mobile = await SecureStorage.instance.getMobile();
+    if (mobile == null) throw Exception('Not logged in');
+    return _repo.fetchDetail(ticketId: ticketId, mobile: mobile);
   }
 
-  void _update(String id, Complaint Function(Complaint) update) {
-    state = [
-      for (final c in state)
-        if (c.id == id) update(c) else c,
-    ];
-  }
+  @override
+  Future<ComplaintDetail> build() => _fetch();
 
-  void accept(String id) => _update(id, (c) => c.copyWith(status: ComplaintStatus.accepted));
-
-  void reject(String id, String reason) => _update(
-        id,
-        (c) => c.copyWith(status: ComplaintStatus.rejected, rejectionReason: Bi(reason, reason)),
-      );
-
-  void saveHearing(String id, {required String date, required String time, required String location, required String officer}) {
-    _update(
-      id,
-      (c) => c.copyWith(
-        status: ComplaintStatus.caseOnboard,
-        hearing: Hearing(date: date, time: time, location: Bi(location, location), officer: Bi(officer, officer)),
-      ),
-    );
-  }
-
-  void saveHearing2(String id, {required String date, required String time, required String location, required String officer}) {
-    _update(
-      id,
-      (c) => c.copyWith(
-        status: ComplaintStatus.finalHearingScheduled,
-        hearing2: Hearing(date: date, time: time, location: Bi(location, location), officer: Bi(officer, officer)),
-      ),
-    );
-  }
-
-  void uploadVerdict(String id, String fileName) {
-    _update(id, (c) => c.copyWith(status: ComplaintStatus.disposedOf, verdictFile: fileName));
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(_fetch);
   }
 }

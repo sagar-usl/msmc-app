@@ -97,7 +97,12 @@
   },
   "profile": {
     "title": "Profile",
-    "logout": "Logout"
+    "logout": "Logout",
+    "setupTitle": "Set up your profile",
+    "setupSubtitle": "Add your name and mobile number to track complaints.",
+    "setupAction": "Set Up",
+    "citizenFallback": "Citizen",
+    "loggedOut": "Logged out."
   },
   "complaint": {
     "newBtn": "New",
