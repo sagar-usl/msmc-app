@@ -185,7 +185,8 @@
     "todayLabel": "आज",
     "noDocLabel": "कोणताही दस्तऐवज संलग्न नाही",
     "devOfficerToggleOn": "अधिकारी दृश्यात जा",
-    "devOfficerToggleOff": "नागरिक दृश्यात जा"
+    "devOfficerToggleOff": "नागरिक दृश्यात जा",
+    "hearingLabel": "सुनावणी"
   },
   "feedback": {
     "headerTitle": "अभिप्राय",

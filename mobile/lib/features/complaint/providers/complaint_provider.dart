@@ -38,12 +38,14 @@ class ComplaintListNotifier extends AsyncNotifier<List<ComplaintSummary>> {
     required String mobile,
     required String category,
     required String description,
+    List<UploadedAttachment> attachments = const [],
   }) async {
     final ticketId = await _repo.submitComplaint(
       fullName: fullName,
       mobile: mobile,
       category: category,
       description: description,
+      attachments: attachments,
     );
     await refresh();
     return ticketId;

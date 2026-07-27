@@ -185,7 +185,8 @@
     "todayLabel": "Today",
     "noDocLabel": "No document attached",
     "devOfficerToggleOn": "Switch to Officer view",
-    "devOfficerToggleOff": "Switch to Citizen view"
+    "devOfficerToggleOff": "Switch to Citizen view",
+    "hearingLabel": "Hearing"
   },
   "feedback": {
     "headerTitle": "Feedback",

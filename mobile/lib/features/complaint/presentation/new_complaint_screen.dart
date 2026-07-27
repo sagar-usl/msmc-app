@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
@@ -6,8 +8,12 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/screen_header.dart';
 import '../../../core/network/api_exception.dart';
 import '../../../core/storage/secure_storage.dart';
+import '../data/complaint_repository.dart';
 import '../providers/complaint_provider.dart';
 import 'complaint_style_helpers.dart';
+
+const _maxAttachments = 5;
+const _allowedExtensions = ['pdf', 'jpg', 'jpeg', 'png'];
 
 class NewComplaintScreen extends ConsumerStatefulWidget {
   const NewComplaintScreen({super.key});
@@ -20,6 +26,7 @@ class _NewComplaintScreenState extends ConsumerState<NewComplaintScreen> {
   final _nameController   = TextEditingController();
   final _mobileController = TextEditingController();
   final _descController   = TextEditingController();
+  final _attachmentRepo = const ComplaintRepository();
 
   String _categoryKey = 'DOCUMENTS';
   bool _nameError   = false;
@@ -28,6 +35,7 @@ class _NewComplaintScreenState extends ConsumerState<NewComplaintScreen> {
   bool _isLoading   = false;
   String? _serverError;
   String? _lastTicketId;
+  final List<File> _pickedFiles = [];
 
   @override
   void initState() {
@@ -49,6 +57,28 @@ class _NewComplaintScreenState extends ConsumerState<NewComplaintScreen> {
     super.dispose();
   }
 
+  Future<void> _pickFiles() async {
+    final remaining = _maxAttachments - _pickedFiles.length;
+    if (remaining <= 0) return;
+
+    final result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+      type: FileType.custom,
+      allowedExtensions: _allowedExtensions,
+    );
+    if (result == null) return;
+
+    setState(() {
+      _pickedFiles.addAll(
+        result.paths.whereType<String>().take(remaining).map((p) => File(p)),
+      );
+    });
+  }
+
+  void _removeFile(int index) {
+    setState(() => _pickedFiles.removeAt(index));
+  }
+
   Future<void> _submit() async {
     final name   = _nameController.text.trim();
     final mobile = _mobileController.text.trim();
@@ -67,11 +97,17 @@ class _NewComplaintScreenState extends ConsumerState<NewComplaintScreen> {
       // Save citizen identity for future sessions
       await SecureStorage.instance.saveCitizen(mobile: mobile, name: name);
 
+      final attachments = <UploadedAttachment>[];
+      for (final file in _pickedFiles) {
+        attachments.add(await _attachmentRepo.uploadAttachment(file));
+      }
+
       final ticketId = await ref.read(complaintListProvider.notifier).submit(
         fullName: name,
         mobile: mobile,
         category: _categoryKey,
         description: desc,
+        attachments: attachments,
       );
 
       setState(() {
@@ -164,6 +200,57 @@ class _NewComplaintScreenState extends ConsumerState<NewComplaintScreen> {
             _label('complaint.complaintDetails'.tr()),
             TextField(controller: _descController, maxLines: 4, onChanged: (_) => setState(() => _descError = false),
               decoration: InputDecoration(hintText: 'complaint.complaintDetailsPh'.tr(), errorText: _descError ? 'complaint.errDescription'.tr() : null)),
+            const SizedBox(height: 12),
+            _label('complaint.uploadDocs'.tr()),
+            InkWell(
+              onTap: _isLoading ? null : _pickFiles,
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.border, width: 1.5, style: BorderStyle.solid),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  children: [
+                    const Icon(Icons.upload_file_outlined, size: 22, color: AppColors.navy),
+                    const SizedBox(height: 4),
+                    Text('complaint.fileDefault'.tr(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimaryAlt)),
+                    const SizedBox(height: 2),
+                    Text('complaint.fileTypes'.tr(), style: const TextStyle(fontSize: 10.5, color: AppColors.textFaint)),
+                  ],
+                ),
+              ),
+            ),
+            if (_pickedFiles.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              ..._pickedFiles.asMap().entries.map((entry) {
+                final i = entry.key;
+                final file = entry.value;
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.insert_drive_file_outlined, size: 16, color: AppColors.navy),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          file.path.split('/').last,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 11.5, color: AppColors.textBody),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: _isLoading ? null : () => _removeFile(i),
+                        child: const Icon(Icons.close, size: 16, color: AppColors.textFaint),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ],
             const SizedBox(height: 14),
             if (_serverError != null) ...[
               Text(_serverError!, style: const TextStyle(fontSize: 12, color: AppColors.red)),

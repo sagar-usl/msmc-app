@@ -18,7 +18,7 @@ String statusLabel(String status, String lang) {
     'ACCEPTED'                => 'Accepted',
     'REJECTED'                => 'Rejected',
     'CASE_ONBOARD'            => 'Case Onboard',
-    'FINAL_HEARING_SCHEDULED' => 'Final Hearing',
+    'FINAL_HEARING_SCHEDULED' => 'Final Hearing Scheduled',
     'DISPOSED_OF'             => 'Disposed Of',
     _                         => status,
   };

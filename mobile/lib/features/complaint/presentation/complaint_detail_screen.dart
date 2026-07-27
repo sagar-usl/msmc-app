@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../core/network/api_client.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/async_screen.dart';
@@ -94,16 +95,46 @@ class _DetailBody extends StatelessWidget {
           ),
         ],
 
-        // Hearing 1
-        if (detail.hearing != null) ...[
+        // Hearings — any number of interim hearings, then one final hearing
+        for (final entry in detail.hearings.asMap().entries) ...[
           const SizedBox(height: 14),
-          _hearingCard('complaint.scheduledHearing'.tr(), detail.hearing!),
+          _hearingCard(
+            entry.value.isFinal
+                ? 'complaint.finalHearingInfo'.tr()
+                : '${'complaint.hearingLabel'.tr()} ${entry.key + 1}',
+            entry.value,
+          ),
         ],
 
-        // Hearing 2
-        if (detail.hearing2 != null) ...[
+        // Attached documents
+        if (detail.documents.isNotEmpty) ...[
           const SizedBox(height: 14),
-          _hearingCard('complaint.finalHearingInfo'.tr(), detail.hearing2!),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('complaint.uploadDocs'.tr(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textMuted, letterSpacing: 0.5)),
+                const SizedBox(height: 10),
+                for (final doc in detail.documents)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: InkWell(
+                      onTap: () => _openUrl(context, ApiClient.instance.absoluteUrl(doc.fileUrl)),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.insert_drive_file_outlined, size: 16, color: AppColors.navy),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(doc.fileName, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, color: AppColors.textBody)),
+                          ),
+                          const Icon(Icons.chevron_right, size: 16, color: AppColors.textFaint),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ],
 
         // Verdict download (only when DISPOSED_OF and URL is available)
@@ -112,7 +143,7 @@ class _DetailBody extends StatelessWidget {
           AppCard(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             radius: 14,
-            onTap: () => _downloadVerdict(context, detail.verdictDownloadUrl!),
+            onTap: () => _openUrl(context, detail.verdictDownloadUrl!),
             child: Row(
               children: [
                 Container(width: 38, height: 38, decoration: BoxDecoration(color: const Color(0x2EFFCC00), borderRadius: BorderRadius.circular(10)), alignment: Alignment.center, child: const Icon(Icons.description_outlined, size: 18, color: AppColors.gold)),
@@ -162,7 +193,7 @@ class _DetailBody extends StatelessWidget {
     ),
   );
 
-  Future<void> _downloadVerdict(BuildContext context, String url) async {
+  Future<void> _openUrl(BuildContext context, String url) async {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);

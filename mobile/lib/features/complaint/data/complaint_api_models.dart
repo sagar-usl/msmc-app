@@ -29,12 +29,14 @@ class HearingInfo {
   final String time;
   final String location;
   final String officer;
+  final bool isFinal;
 
   const HearingInfo({
     required this.date,
     required this.time,
     required this.location,
     required this.officer,
+    required this.isFinal,
   });
 
   factory HearingInfo.fromJson(Map<String, dynamic> j) => HearingInfo(
@@ -42,6 +44,19 @@ class HearingInfo {
     time:     j['time'] as String,
     location: j['location'] as String,
     officer:  j['officer'] as String,
+    isFinal:  j['isFinal'] as bool,
+  );
+}
+
+class ComplaintAttachmentInfo {
+  final String fileName;
+  final String fileUrl;
+
+  const ComplaintAttachmentInfo({required this.fileName, required this.fileUrl});
+
+  factory ComplaintAttachmentInfo.fromJson(Map<String, dynamic> j) => ComplaintAttachmentInfo(
+    fileName: j['fileName'] as String,
+    fileUrl:  j['fileUrl'] as String,
   );
 }
 
@@ -53,8 +68,8 @@ class ComplaintDetail {
   final String submittedAt;
   final String? assignedOfficer;
   final String? rejectionReason;
-  final HearingInfo? hearing;
-  final HearingInfo? hearing2;
+  final List<HearingInfo> hearings;
+  final List<ComplaintAttachmentInfo> documents;
   /// Pre-built download URL from the server (includes mobile + ticket query params).
   final String? verdictDownloadUrl;
 
@@ -66,8 +81,8 @@ class ComplaintDetail {
     required this.submittedAt,
     this.assignedOfficer,
     this.rejectionReason,
-    this.hearing,
-    this.hearing2,
+    required this.hearings,
+    required this.documents,
     this.verdictDownloadUrl,
   });
 
@@ -79,8 +94,12 @@ class ComplaintDetail {
     submittedAt:      j['submittedAt'] as String,
     assignedOfficer:  j['assignedOfficer'] as String?,
     rejectionReason:  j['rejectionReason'] as String?,
-    hearing:  j['hearing'] != null  ? HearingInfo.fromJson(j['hearing'] as Map<String, dynamic>)  : null,
-    hearing2: j['hearing2'] != null ? HearingInfo.fromJson(j['hearing2'] as Map<String, dynamic>) : null,
+    hearings: (j['hearings'] as List<dynamic>)
+        .map((h) => HearingInfo.fromJson(h as Map<String, dynamic>))
+        .toList(),
+    documents: (j['documents'] as List<dynamic>)
+        .map((d) => ComplaintAttachmentInfo.fromJson(d as Map<String, dynamic>))
+        .toList(),
     verdictDownloadUrl: j['verdictDownloadUrl'] as String?,
   );
 }

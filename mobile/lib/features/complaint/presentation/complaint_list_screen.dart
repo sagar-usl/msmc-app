@@ -79,20 +79,27 @@ class ComplaintListScreen extends ConsumerWidget {
   }
 }
 
-class _ComplaintTile extends StatelessWidget {
+class _ComplaintTile extends ConsumerWidget {
   final ComplaintSummary c;
   final String lang;
   const _ComplaintTile({required this.c, required this.lang});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final (bg, fg) = statusColors(c.status);
     return AppCard(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
       radius: 14,
       shadowOpacity: 0.09,
       shadowBlur: 14,
-      onTap: () => context.push('/complaint/${Uri.encodeComponent(c.id)}'),
+      onTap: () async {
+        // context.push() resolves when the detail screen is popped — the
+        // officer may have changed this complaint's status in the meantime
+        // (admin dashboard, or another device), so refetch on return instead
+        // of showing whatever was cached when this list first loaded.
+        await context.push('/complaint/${Uri.encodeComponent(c.id)}');
+        ref.read(complaintListProvider.notifier).refresh();
+      },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

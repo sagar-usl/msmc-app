@@ -1,8 +1,35 @@
+import 'dart:io';
+import 'package:dio/dio.dart';
 import '../../../core/network/api_client.dart';
 import 'complaint_api_models.dart';
 
+/// Reference to an already-uploaded file, returned by [ComplaintRepository.uploadAttachment]
+/// and passed to [ComplaintRepository.submitComplaint].
+class UploadedAttachment {
+  final String fileName;
+  final String filePath;
+  const UploadedAttachment({required this.fileName, required this.filePath});
+}
+
 class ComplaintRepository {
   const ComplaintRepository();
+
+  /// Uploads one supporting document (image or PDF) ahead of complaint
+  /// submission. Call once per picked file, then pass the results to
+  /// [submitComplaint].
+  Future<UploadedAttachment> uploadAttachment(File file) async {
+    final formData = FormData.fromMap({
+      'file': await MultipartFile.fromFile(file.path, filename: file.path.split('/').last),
+    });
+    final data = await ApiClient.instance.post<Map<String, dynamic>>(
+      '/api/v1/uploads/complaint-attachment',
+      data: formData,
+    );
+    return UploadedAttachment(
+      fileName: data['fileName'] as String,
+      filePath: data['filePath'] as String,
+    );
+  }
 
   /// Fetch all complaints for this citizen by mobile number.
   Future<List<ComplaintSummary>> fetchMyComplaints(String mobile) async {
@@ -20,6 +47,7 @@ class ComplaintRepository {
     required String mobile,
     required String category,
     required String description,
+    List<UploadedAttachment> attachments = const [],
   }) async {
     final data = await ApiClient.instance.post<Map<String, dynamic>>(
       '/api/v1/complaints',
@@ -28,6 +56,9 @@ class ComplaintRepository {
         'mobile': mobile,
         'category': category,
         'description': description,
+        'attachments': attachments
+            .map((a) => {'fileName': a.fileName, 'filePath': a.filePath})
+            .toList(),
       },
     );
     return data['ticketId'] as String;
