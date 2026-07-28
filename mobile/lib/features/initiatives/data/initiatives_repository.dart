@@ -8,8 +8,8 @@ class InitiativeApiItem {
   final String districtMr;
   final String? descriptionEn;
   final String? descriptionMr;
-  /// Relative URL like /api/v1/uploads/initiative-image/xxx.jpg, or null.
-  final String? imagePath;
+  /// Relative URLs like /api/v1/uploads/initiative-image/xxx.jpg.
+  final List<String> images;
 
   const InitiativeApiItem({
     required this.id,
@@ -19,7 +19,7 @@ class InitiativeApiItem {
     required this.districtMr,
     this.descriptionEn,
     this.descriptionMr,
-    this.imagePath,
+    required this.images,
   });
 
   factory InitiativeApiItem.fromJson(Map<String, dynamic> j) => InitiativeApiItem(
@@ -30,18 +30,15 @@ class InitiativeApiItem {
     districtMr: j['districtMr'] as String,
     descriptionEn: j['descriptionEn'] as String?,
     descriptionMr: j['descriptionMr'] as String?,
-    imagePath: j['imagePath'] as String?,
+    images: (j['images'] as List<dynamic>).map((e) => e as String).toList(),
   );
 
   String title(String lang) => lang == 'mr' ? titleMr : titleEn;
   String district(String lang) => lang == 'mr' ? districtMr : districtEn;
   String description(String lang) => lang == 'mr' ? (descriptionMr ?? '') : (descriptionEn ?? '');
 
-  /// Absolute image URL built from the API client's base URL.
-  String? imageUrl() {
-    if (imagePath == null) return null;
-    return ApiClient.instance.absoluteUrl(imagePath!);
-  }
+  /// Absolute image URLs built from the API client's base URL.
+  List<String> imageUrls() => images.map((p) => ApiClient.instance.absoluteUrl(p)).toList();
 }
 
 class InitiativesRepository {

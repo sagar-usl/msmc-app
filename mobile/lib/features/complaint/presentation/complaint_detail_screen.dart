@@ -95,6 +95,22 @@ class _DetailBody extends StatelessWidget {
           ),
         ],
 
+        // Dismissal reason
+        if (detail.status == 'DISMISSED' && detail.dismissalReason != null) ...[
+          const SizedBox(height: 14),
+          AppCard(
+            border: const Border(left: BorderSide(color: AppColors.textMuted, width: 3)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('complaint.dismissalReasonLabel'.tr(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textMuted)),
+                const SizedBox(height: 5),
+                Text(detail.dismissalReason!, style: const TextStyle(fontSize: 12.5, height: 1.6, color: AppColors.textBody)),
+              ],
+            ),
+          ),
+        ],
+
         // Hearings — any number of interim hearings, then one final hearing
         for (final entry in detail.hearings.asMap().entries) ...[
           const SizedBox(height: 14),

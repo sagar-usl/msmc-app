@@ -11,6 +11,7 @@ class AppTheme {
       useMaterial3: true,
       scaffoldBackgroundColor: AppColors.background,
       fontFamily: AppTextStyles.fontFamily(languageCode),
+      fontFamilyFallback: AppTextStyles.fontFamilyFallback(languageCode),
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.navy,
         primary: AppColors.navy,

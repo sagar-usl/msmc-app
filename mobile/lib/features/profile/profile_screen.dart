@@ -2,7 +2,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:async';
 import '../../core/theme/app_colors.dart';
+import '../../core/notifications/notification_service.dart';
 import '../../core/storage/secure_storage.dart';
 import '../../core/widgets/app_card.dart';
 import '../complaint/providers/complaint_provider.dart';
@@ -221,6 +223,7 @@ class _OnboardingSheetState extends State<_OnboardingSheet> {
 
     setState(() => _isSaving = true);
     await SecureStorage.instance.saveCitizen(mobile: mobile, name: name);
+    unawaited(NotificationService.instance.syncTokenForCurrentCitizen());
     widget.ref.invalidate(citizenMobileProvider);
     widget.ref.invalidate(citizenNameProvider);
     widget.ref.invalidate(complaintListProvider);

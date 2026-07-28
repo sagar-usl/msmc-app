@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "405108823869",
+    "project_id": "msmc-25cad",
+    "storage_bucket": "msmc-25cad.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:405108823869:android:5cdac74e0e555923a49754",
+        "android_client_info": {
+          "package_name": "com.msmc.msmc_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDycJRIIg0JIIar2xk2L6IewdaSREpT4XU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
@@ -7,6 +8,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/screen_header.dart';
 import '../../../core/network/api_exception.dart';
+import '../../../core/notifications/notification_service.dart';
 import '../../../core/storage/secure_storage.dart';
 import '../data/complaint_repository.dart';
 import '../providers/complaint_provider.dart';
@@ -96,6 +98,7 @@ class _NewComplaintScreenState extends ConsumerState<NewComplaintScreen> {
     try {
       // Save citizen identity for future sessions
       await SecureStorage.instance.saveCitizen(mobile: mobile, name: name);
+      unawaited(NotificationService.instance.syncTokenForCurrentCitizen());
 
       final attachments = <UploadedAttachment>[];
       for (final file in _pickedFiles) {

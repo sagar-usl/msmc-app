@@ -1,11 +1,23 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/async_screen.dart';
 import '../../core/widgets/screen_header.dart';
 import 'providers/education_provider.dart';
+
+Future<void> _openUrl(BuildContext context, String url) async {
+  final uri = Uri.parse(url);
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  } else if (context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Could not open this document.')),
+    );
+  }
+}
 
 class EducationScreen extends ConsumerWidget {
   const EducationScreen({super.key});
@@ -33,12 +45,13 @@ class EducationScreen extends ConsumerWidget {
                       separatorBuilder: (_, __) => const SizedBox(height: 10),
                       itemBuilder: (context, i) {
                         final it = items[i];
+                        final fileUrl = it.absoluteFileUrl();
                         return AppCard(
                           padding: const EdgeInsets.all(14),
                           radius: 14,
                           shadowOpacity: 0.06,
                           shadowBlur: 8,
-                          onTap: () {},
+                          onTap: fileUrl != null ? () => _openUrl(context, fileUrl) : null,
                           child: Row(
                             children: [
                               Container(
@@ -58,7 +71,11 @@ class EducationScreen extends ConsumerWidget {
                                   ],
                                 ),
                               ),
-                              const Icon(Icons.chevron_right, size: 16, color: AppColors.textFaint),
+                              Icon(
+                                fileUrl != null ? Icons.file_download_outlined : Icons.chevron_right,
+                                size: fileUrl != null ? 18 : 16,
+                                color: fileUrl != null ? AppColors.navy : AppColors.textFaint,
+                              ),
                             ],
                           ),
                         );

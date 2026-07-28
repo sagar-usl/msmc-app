@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
-/// Text styles for the two supported locales. Marathi copy uses Noto Sans
-/// Devanagari (bundled locally) instead of Roboto so Devanagari glyphs render
-/// correctly; English stays on Roboto everywhere, matching the prototype's
+/// Text styles for the two supported locales. The UI locale only picks which
+/// font leads; both fonts are always available via [fontFamilyFallback] so
+/// user-entered text renders correctly regardless of script — e.g. a citizen
+/// browsing in English can still type their name or complaint in Marathi
+/// (Devanagari), and that text must still render (not as tofu boxes) whether
+/// on their own device or the admin's. Matches the prototype's
 /// `font-family:'Roboto','Noto Sans Devanagari',...` stacks.
 class AppTextStyles {
   AppTextStyles._();
@@ -11,8 +14,12 @@ class AppTextStyles {
   static String fontFamily(String languageCode) =>
       languageCode == 'mr' ? 'NotoSansDevanagari' : 'Roboto';
 
+  static List<String> fontFamilyFallback(String languageCode) =>
+      languageCode == 'mr' ? const ['Roboto'] : const ['NotoSansDevanagari'];
+
   static TextStyle base(String languageCode) => TextStyle(
         fontFamily: fontFamily(languageCode),
+        fontFamilyFallback: fontFamilyFallback(languageCode),
         color: AppColors.textPrimary,
       );
 

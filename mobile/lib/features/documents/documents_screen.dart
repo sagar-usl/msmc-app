@@ -1,12 +1,24 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/async_screen.dart';
 import '../../core/widgets/screen_header.dart';
 import 'data/documents_repository.dart';
 import 'providers/documents_provider.dart';
+
+Future<void> _openUrl(BuildContext context, String url) async {
+  final uri = Uri.parse(url);
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  } else if (context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Could not open this document.')),
+    );
+  }
+}
 
 class DocumentsScreen extends ConsumerStatefulWidget {
   const DocumentsScreen({super.key});
@@ -66,12 +78,13 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
                               itemBuilder: (context, i) {
                                 final doc = filtered[i];
                                 final tint = _tintFor(doc.category);
+                                final fileUrl = doc.absoluteFileUrl();
                                 return AppCard(
                                   padding: const EdgeInsets.all(14),
                                   radius: 14,
                                   shadowOpacity: 0.06,
                                   shadowBlur: 8,
-                                  onTap: () {},
+                                  onTap: fileUrl != null ? () => _openUrl(context, fileUrl) : null,
                                   child: Row(
                                     children: [
                                       Container(
@@ -91,7 +104,8 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
                                           ],
                                         ),
                                       ),
-                                      // No download — only verdict files are downloadable
+                                      if (fileUrl != null)
+                                        const Icon(Icons.file_download_outlined, size: 18, color: AppColors.navy),
                                     ],
                                   ),
                                 );

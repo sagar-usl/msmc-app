@@ -68,6 +68,7 @@ class ComplaintDetail {
   final String submittedAt;
   final String? assignedOfficer;
   final String? rejectionReason;
+  final String? dismissalReason;
   final List<HearingInfo> hearings;
   final List<ComplaintAttachmentInfo> documents;
   /// Pre-built download URL from the server (includes mobile + ticket query params).
@@ -81,6 +82,7 @@ class ComplaintDetail {
     required this.submittedAt,
     this.assignedOfficer,
     this.rejectionReason,
+    this.dismissalReason,
     required this.hearings,
     required this.documents,
     this.verdictDownloadUrl,
@@ -94,6 +96,7 @@ class ComplaintDetail {
     submittedAt:      j['submittedAt'] as String,
     assignedOfficer:  j['assignedOfficer'] as String?,
     rejectionReason:  j['rejectionReason'] as String?,
+    dismissalReason:  j['dismissalReason'] as String?,
     hearings: (j['hearings'] as List<dynamic>)
         .map((h) => HearingInfo.fromJson(h as Map<String, dynamic>))
         .toList(),

@@ -17,7 +17,7 @@ class DocumentApiItem {
   final String? metaEn;
   final String? metaMr;
   final ApiDocCategory category;
-  final String? filePath;
+  final String? fileUrl;
 
   const DocumentApiItem({
     required this.id,
@@ -26,7 +26,7 @@ class DocumentApiItem {
     this.metaEn,
     this.metaMr,
     required this.category,
-    this.filePath,
+    this.fileUrl,
   });
 
   factory DocumentApiItem.fromJson(Map<String, dynamic> j) => DocumentApiItem(
@@ -36,11 +36,14 @@ class DocumentApiItem {
     metaEn: j['metaEn'] as String?,
     metaMr: j['metaMr'] as String?,
     category: ApiDocCategoryExt.fromString(j['category'] as String),
-    filePath: j['filePath'] as String?,
+    fileUrl: j['fileUrl'] as String?,
   );
 
   String title(String lang) => lang == 'mr' ? titleMr : titleEn;
   String? meta(String lang) => lang == 'mr' ? metaMr : metaEn;
+
+  /// Absolute file URL built from the API client's base URL, or null if no file.
+  String? absoluteFileUrl() => fileUrl != null ? ApiClient.instance.absoluteUrl(fileUrl!) : null;
 }
 
 class DocumentsRepository {

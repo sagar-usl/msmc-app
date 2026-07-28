@@ -9,6 +9,7 @@ import '../../../core/theme/app_colors.dart';
   'CASE_ONBOARD'            => (const Color(0xFFCFE2FF), AppColors.navy),
   'FINAL_HEARING_SCHEDULED' => (const Color(0xFFD3E3FD), AppColors.navyLight),
   'DISPOSED_OF'             => (const Color(0xFFD1E7DD), AppColors.green),
+  'DISMISSED'               => (const Color(0xFFE2E3E5), AppColors.textMuted),
   _                         => (const Color(0xFFF0F0F0), AppColors.textMuted),
 };
 
@@ -20,6 +21,7 @@ String statusLabel(String status, String lang) {
     'CASE_ONBOARD'            => 'Case Onboard',
     'FINAL_HEARING_SCHEDULED' => 'Final Hearing Scheduled',
     'DISPOSED_OF'             => 'Disposed Of',
+    'DISMISSED'               => 'Dismissed',
     _                         => status,
   };
   if (lang != 'mr') return en;
@@ -30,6 +32,7 @@ String statusLabel(String status, String lang) {
     'CASE_ONBOARD'            => 'केस सुरू',
     'FINAL_HEARING_SCHEDULED' => 'अंतिम सुनावणी',
     'DISPOSED_OF'             => 'निकाल',
+    'DISMISSED'               => 'रद्द केलेले',
     _                         => status,
   };
 }

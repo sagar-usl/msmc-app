@@ -6,6 +6,7 @@ class EducationApiItem {
   final String titleMr;
   final String? descEn;
   final String? descMr;
+  final String? fileUrl;
 
   const EducationApiItem({
     required this.id,
@@ -13,6 +14,7 @@ class EducationApiItem {
     required this.titleMr,
     this.descEn,
     this.descMr,
+    this.fileUrl,
   });
 
   factory EducationApiItem.fromJson(Map<String, dynamic> j) => EducationApiItem(
@@ -21,10 +23,14 @@ class EducationApiItem {
     titleMr: j['titleMr'] as String,
     descEn: j['descEn'] as String?,
     descMr: j['descMr'] as String?,
+    fileUrl: j['fileUrl'] as String?,
   );
 
   String title(String lang) => lang == 'mr' ? titleMr : titleEn;
   String desc(String lang) => lang == 'mr' ? (descMr ?? '') : (descEn ?? '');
+
+  /// Absolute file URL built from the API client's base URL, or null if no file.
+  String? absoluteFileUrl() => fileUrl != null ? ApiClient.instance.absoluteUrl(fileUrl!) : null;
 }
 
 class EducationRepository {

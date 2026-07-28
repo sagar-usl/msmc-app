@@ -50,7 +50,7 @@ class _InitiativeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = item.imageUrl();
+    final imageUrls = item.imageUrls();
     return AppCard(
       padding: EdgeInsets.zero,
       radius: 16,
@@ -59,21 +59,14 @@ class _InitiativeCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Hero image — network if available, fallback gradient otherwise
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             child: SizedBox(
               height: 100,
               width: double.infinity,
-              child: imageUrl != null
-                  ? Image.network(
-                      imageUrl,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (_, child, prog) =>
-                          prog == null ? child : const _ImagePlaceholder(),
-                      errorBuilder: (_, __, ___) => const _ImagePlaceholder(),
-                    )
-                  : const _ImagePlaceholder(),
+              child: imageUrls.isEmpty
+                  ? const _ImagePlaceholder()
+                  : _ImageCarousel(imageUrls: imageUrls),
             ),
           ),
           Padding(
@@ -99,6 +92,66 @@ class _InitiativeCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ImageCarousel extends StatefulWidget {
+  final List<String> imageUrls;
+  const _ImageCarousel({required this.imageUrls});
+
+  @override
+  State<_ImageCarousel> createState() => _ImageCarouselState();
+}
+
+class _ImageCarouselState extends State<_ImageCarousel> {
+  final _controller = PageController();
+  int _page = 0;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        PageView.builder(
+          controller: _controller,
+          itemCount: widget.imageUrls.length,
+          onPageChanged: (i) => setState(() => _page = i),
+          itemBuilder: (context, i) => Image.network(
+            widget.imageUrls[i],
+            fit: BoxFit.cover,
+            loadingBuilder: (_, child, prog) => prog == null ? child : const _ImagePlaceholder(),
+            errorBuilder: (_, __, ___) => const _ImagePlaceholder(),
+          ),
+        ),
+        if (widget.imageUrls.length > 1)
+          Positioned(
+            bottom: 8,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(widget.imageUrls.length, (i) {
+                final active = i == _page;
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 2),
+                  width: active ? 14 : 5,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: active ? 0.95 : 0.55),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                );
+              }),
+            ),
+          ),
+      ],
     );
   }
 }

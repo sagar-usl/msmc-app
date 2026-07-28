@@ -137,6 +137,7 @@
     "descriptionLabel": "Complaint Description",
     "timelineHeading": "Case Progress Timeline",
     "rejectionReasonLabel": "Reason for Rejection",
+    "dismissalReasonLabel": "Reason for Dismissal",
     "officerDecision": "Officer Decision",
     "rejectReasonPh": "Enter reason for rejection",
     "cancel": "Cancel",
