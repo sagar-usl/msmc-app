@@ -7,8 +7,15 @@ import '../theme/app_colors.dart';
 /// centre, and search/notification/language/hamburger icons on the right.
 class AppHeader extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onMenuTap;
+  final VoidCallback onNotificationsTap;
+  final bool hasUnreadNotifications;
 
-  const AppHeader({super.key, required this.onMenuTap});
+  const AppHeader({
+    super.key,
+    required this.onMenuTap,
+    required this.onNotificationsTap,
+    this.hasUnreadNotifications = false,
+  });
 
   /// Generous enough to cover a real status bar inset (via the inner
   /// SafeArea) plus the ~68px of actual header content beneath it. Any
@@ -104,7 +111,11 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
                   context.setLocale(next);
                 },
               ),
-              _HeaderIconButton(icon: Icons.notifications_outlined, showDot: true, onTap: () {}),
+              _HeaderIconButton(
+                icon: Icons.notifications_outlined,
+                showDot: hasUnreadNotifications,
+                onTap: onNotificationsTap,
+              ),
               _HeaderIconButton(icon: Icons.menu, onTap: onMenuTap),
             ],
           ),

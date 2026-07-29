@@ -1,9 +1,16 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import '../../core/network/api_client.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/open_url.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/screen_header.dart';
 import 'data/pm_scheme_content.dart';
+
+// Uploaded via the admin Documents CMS pipeline (uploads/content-documents/),
+// same serving route as Documents/Education attachments — see
+// /api/v1/uploads/content-document/[filename] in msmc-admin.
+const _kPmSchemeDocumentPath = '/api/v1/uploads/content-document/pm_15_point_programme.pdf';
 
 class PmSchemeScreen extends StatefulWidget {
   const PmSchemeScreen({super.key});
@@ -182,7 +189,10 @@ class _PmSchemeScreenState extends State<PmSchemeScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: () => openExternalUrl(
+                          context,
+                          ApiClient.instance.absoluteUrl(_kPmSchemeDocumentPath),
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.navy,
                           foregroundColor: Colors.white,

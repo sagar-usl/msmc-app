@@ -2,9 +2,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:async';
 import '../../core/theme/app_colors.dart';
-import '../../core/notifications/notification_service.dart';
+import '../../core/auth/auth_state_provider.dart';
+import '../../core/auth/onboarding_sheet.dart';
 import '../../core/storage/secure_storage.dart';
 import '../../core/widgets/app_card.dart';
 import '../complaint/providers/complaint_provider.dart';
@@ -57,9 +57,14 @@ class ProfileScreen extends ConsumerWidget {
                             height: 64,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              border: Border.all(color: AppColors.saffron, width: 2.5),
+                              gradient: const LinearGradient(colors: [AppColors.saffron, AppColors.saffronDark], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                              border: Border.all(color: Colors.white, width: 2.5),
                               boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.25), blurRadius: 12, offset: const Offset(0, 4))],
-                              image: const DecorationImage(image: AssetImage('assets/images/profile-avatar.png'), fit: BoxFit.cover),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              _initialsOf(name),
+                              style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -101,7 +106,7 @@ class ProfileScreen extends ConsumerWidget {
                             ),
                           ),
                           TextButton(
-                            onPressed: () => _showOnboardingSheet(context, ref, initialName: name, initialMobile: mobile),
+                            onPressed: () => showOnboardingSheet(context, ref, initialName: name, initialMobile: mobile),
                             style: TextButton.styleFrom(backgroundColor: AppColors.saffron, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8)),
                             child: Text('profile.setupAction'.tr(), style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
                           ),
@@ -167,115 +172,13 @@ class ProfileScreen extends ConsumerWidget {
     await SecureStorage.instance.clear();
     ref.invalidate(citizenMobileProvider);
     ref.invalidate(citizenNameProvider);
+    ref.invalidate(isLoggedInProvider);
     ref.invalidate(complaintListProvider);
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('profile.loggedOut'.tr())));
     }
   }
 
-  void _showOnboardingSheet(BuildContext context, WidgetRef ref, {String? initialName, String? initialMobile}) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (sheetContext) => _OnboardingSheet(
-        ref: ref,
-        initialName: initialName,
-        initialMobile: initialMobile,
-      ),
-    );
-  }
-}
-
-class _OnboardingSheet extends StatefulWidget {
-  final WidgetRef ref;
-  final String? initialName;
-  final String? initialMobile;
-  const _OnboardingSheet({required this.ref, this.initialName, this.initialMobile});
-
-  @override
-  State<_OnboardingSheet> createState() => _OnboardingSheetState();
-}
-
-class _OnboardingSheetState extends State<_OnboardingSheet> {
-  late final _nameController = TextEditingController(text: widget.initialName);
-  late final _mobileController = TextEditingController(text: widget.initialMobile);
-  bool _nameError = false;
-  bool _mobileError = false;
-  bool _isSaving = false;
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _mobileController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _save() async {
-    final name = _nameController.text.trim();
-    final mobile = _mobileController.text.trim();
-    setState(() {
-      _nameError = name.isEmpty;
-      _mobileError = !RegExp(r'^[0-9]{10}$').hasMatch(mobile);
-    });
-    if (_nameError || _mobileError) return;
-
-    setState(() => _isSaving = true);
-    await SecureStorage.instance.saveCitizen(mobile: mobile, name: name);
-    unawaited(NotificationService.instance.syncTokenForCurrentCitizen());
-    widget.ref.invalidate(citizenMobileProvider);
-    widget.ref.invalidate(citizenNameProvider);
-    widget.ref.invalidate(complaintListProvider);
-    if (mounted) Navigator.of(context).pop();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text('profile.setupTitle'.tr(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-          const SizedBox(height: 4),
-          Text('profile.setupSubtitle'.tr(), style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
-          const SizedBox(height: 16),
-          Text('complaint.fullName'.tr(), style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
-          const SizedBox(height: 6),
-          TextField(
-            controller: _nameController,
-            onChanged: (_) => setState(() => _nameError = false),
-            decoration: InputDecoration(hintText: 'complaint.fullNamePh'.tr(), errorText: _nameError ? 'complaint.errName'.tr() : null),
-          ),
-          const SizedBox(height: 12),
-          Text('complaint.mobileNumber'.tr(), style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: AppColors.textMuted)),
-          const SizedBox(height: 6),
-          TextField(
-            controller: _mobileController,
-            keyboardType: TextInputType.phone,
-            maxLength: 10,
-            onChanged: (_) => setState(() => _mobileError = false),
-            decoration: InputDecoration(hintText: 'complaint.mobilePh'.tr(), errorText: _mobileError ? 'complaint.errMobile'.tr() : null, counterText: ''),
-          ),
-          const SizedBox(height: 8),
-          ElevatedButton(
-            onPressed: _isSaving ? null : _save,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.navy,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 13),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            child: _isSaving
-                ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                : Text('profile.setupAction'.tr(), style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700)),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _MenuEntry {
@@ -283,4 +186,17 @@ class _MenuEntry {
   final String label;
   final VoidCallback? onTap;
   _MenuEntry(this.icon, this.label, this.onTap);
+}
+
+/// Up to 2 initials from the citizen's own name — replaces what used to be
+/// one fixed stock photo shown identically to every logged-in citizen.
+String _initialsOf(String? name) {
+  if (name == null || name.trim().isEmpty) return '?';
+  return name
+      .trim()
+      .split(RegExp(r'\s+'))
+      .map((part) => part[0])
+      .take(2)
+      .join()
+      .toUpperCase();
 }

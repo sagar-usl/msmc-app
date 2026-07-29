@@ -6,7 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/login_required_view.dart';
 import '../../../core/widgets/screen_header.dart';
+import '../../../core/auth/auth_state_provider.dart';
+import '../../../core/auth/otp_verification_sheet.dart';
 import '../../../core/network/api_exception.dart';
 import '../../../core/notifications/notification_service.dart';
 import '../../../core/storage/secure_storage.dart';
@@ -42,13 +45,18 @@ class _NewComplaintScreenState extends ConsumerState<NewComplaintScreen> {
   @override
   void initState() {
     super.initState();
-    // Pre-fill mobile/name from storage if the citizen already onboarded
-    SecureStorage.instance.getMobile().then((m) {
-      if (m != null && mounted) _mobileController.text = m;
-    });
-    SecureStorage.instance.getName().then((n) {
-      if (n != null && mounted) _nameController.text = n;
-    });
+    _prefillFromStorage();
+  }
+
+  // Pre-fill mobile/name from storage if the citizen is already onboarded.
+  // Called both at mount and whenever the login gate reports the citizen
+  // just logged in (via LoginRequiredView) — the fields would otherwise sit
+  // empty right after that, since initState only runs once, before login.
+  Future<void> _prefillFromStorage() async {
+    final mobile = await SecureStorage.instance.getMobile();
+    if (mobile != null && mounted && _mobileController.text.isEmpty) _mobileController.text = mobile;
+    final name = await SecureStorage.instance.getName();
+    if (name != null && mounted && _nameController.text.isEmpty) _nameController.text = name;
   }
 
   @override
@@ -94,11 +102,17 @@ class _NewComplaintScreenState extends ConsumerState<NewComplaintScreen> {
     });
     if (_nameError || _mobileError || _descError) return;
 
+    final verified = await verifyMobileOtp(context, mobile);
+    if (!verified || !mounted) return;
+
     setState(() => _isLoading = true);
     try {
       // Save citizen identity for future sessions
       await SecureStorage.instance.saveCitizen(mobile: mobile, name: name);
       unawaited(NotificationService.instance.syncTokenForCurrentCitizen());
+      ref.invalidate(citizenMobileProvider);
+      ref.invalidate(citizenNameProvider);
+      ref.invalidate(isLoggedInProvider);
 
       final attachments = <UploadedAttachment>[];
       for (final file in _pickedFiles) {
@@ -131,10 +145,23 @@ class _NewComplaintScreenState extends ConsumerState<NewComplaintScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loggedInAsync = ref.watch(isLoggedInProvider);
     return Column(
       children: [
         ScreenHeader(title: 'complaint.headerForm'.tr(), onBack: () => Navigator.of(context).maybePop()),
-        Expanded(child: _lastTicketId != null ? _buildSuccess() : _buildForm()),
+        Expanded(
+          child: loggedInAsync.when(
+            data: (loggedIn) {
+              if (loggedIn) {
+                _prefillFromStorage();
+                return _lastTicketId != null ? _buildSuccess() : _buildForm();
+              }
+              return LoginRequiredView(message: 'auth.loginRequiredComplaint'.tr());
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (_, __) => LoginRequiredView(message: 'auth.loginRequiredComplaint'.tr()),
+          ),
+        ),
       ],
     );
   }

@@ -49,5 +49,20 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
+        <!-- Required since Android 11 (API 30) package visibility changes —
+             without this, canLaunchUrl() returns false for https/http links
+             even when a browser or PDF viewer capable of opening them is
+             installed, since the app can no longer implicitly "see" other
+             installed apps. This is what was breaking "Open Document" /
+             "View PDF" taps (Documents, Education, Initiatives) with a
+             false "Could not open this document" error. -->
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="https"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="http"/>
+        </intent>
     </queries>
 </manifest>

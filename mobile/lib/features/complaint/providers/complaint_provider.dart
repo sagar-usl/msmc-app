@@ -5,12 +5,6 @@ import '../data/complaint_repository.dart';
 
 final _repo = const ComplaintRepository();
 
-/// Provider that exposes the current citizen's mobile (null = not onboarded yet).
-final citizenMobileProvider = FutureProvider<String?>((ref) => SecureStorage.instance.getMobile());
-
-/// Provider that exposes the current citizen's saved name (null = not onboarded yet).
-final citizenNameProvider = FutureProvider<String?>((ref) => SecureStorage.instance.getName());
-
 /// Complaint list — loaded once the mobile is known.
 final complaintListProvider =
     AsyncNotifierProvider<ComplaintListNotifier, List<ComplaintSummary>>(ComplaintListNotifier.new);

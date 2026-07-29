@@ -1,9 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/open_url.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/async_screen.dart';
 import '../../../core/widgets/screen_header.dart';
@@ -135,7 +135,7 @@ class _DetailBody extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: InkWell(
-                      onTap: () => _openUrl(context, ApiClient.instance.absoluteUrl(doc.fileUrl)),
+                      onTap: () => openExternalUrl(context, ApiClient.instance.absoluteUrl(doc.fileUrl)),
                       child: Row(
                         children: [
                           const Icon(Icons.insert_drive_file_outlined, size: 16, color: AppColors.navy),
@@ -159,7 +159,11 @@ class _DetailBody extends StatelessWidget {
           AppCard(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             radius: 14,
-            onTap: () => _openUrl(context, detail.verdictDownloadUrl!),
+            onTap: () => openExternalUrl(
+              context,
+              detail.verdictDownloadUrl!,
+              errorMessage: 'Could not open the verdict file.',
+            ),
             child: Row(
               children: [
                 Container(width: 38, height: 38, decoration: BoxDecoration(color: const Color(0x2EFFCC00), borderRadius: BorderRadius.circular(10)), alignment: Alignment.center, child: const Icon(Icons.description_outlined, size: 18, color: AppColors.gold)),
@@ -208,17 +212,4 @@ class _DetailBody extends StatelessWidget {
       ],
     ),
   );
-
-  Future<void> _openUrl(BuildContext context, String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not open the verdict file.')),
-        );
-      }
-    }
-  }
 }

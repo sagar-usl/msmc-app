@@ -90,7 +90,8 @@
     "visitOffice": "Visit Office"
   },
   "education": {
-    "title": "Education & Scholarship"
+    "title": "Education & Scholarship",
+    "openDocument": "Open Document"
   },
   "news": {
     "title": "News"
@@ -203,5 +204,25 @@
     "feedbackPlaceholder": "Tell us about your experience",
     "messageError": "Please share a few words of feedback",
     "submitBtn": "Submit Feedback"
+  },
+  "otp": {
+    "title": "Verify Your Mobile Number",
+    "sentTo": "We've sent a 6-digit code to",
+    "placeholder": "Enter 6-digit code",
+    "verifyBtn": "Verify",
+    "resend": "Resend Code",
+    "resendIn": "Resend in",
+    "invalid": "Invalid code. Please try again.",
+    "sendFailed": "Could not send OTP. Please try again.",
+    "verifying": "Verifying…",
+    "sending": "Sending code…",
+    "cancel": "Cancel",
+    "tryAgain": "Try Again"
+  },
+  "auth": {
+    "loginRequiredTitle": "Login Required",
+    "loginRequiredComplaint": "Please login with your mobile number first to file a complaint.",
+    "loginRequiredFeedback": "Please login with your mobile number first to give feedback.",
+    "loginNow": "Login Now"
   }
 }

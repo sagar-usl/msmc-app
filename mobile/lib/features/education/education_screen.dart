@@ -1,23 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/async_screen.dart';
 import '../../core/widgets/screen_header.dart';
 import 'providers/education_provider.dart';
-
-Future<void> _openUrl(BuildContext context, String url) async {
-  final uri = Uri.parse(url);
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
-  } else if (context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Could not open this document.')),
-    );
-  }
-}
 
 class EducationScreen extends ConsumerWidget {
   const EducationScreen({super.key});
@@ -45,13 +34,12 @@ class EducationScreen extends ConsumerWidget {
                       separatorBuilder: (_, __) => const SizedBox(height: 10),
                       itemBuilder: (context, i) {
                         final it = items[i];
-                        final fileUrl = it.absoluteFileUrl();
                         return AppCard(
                           padding: const EdgeInsets.all(14),
                           radius: 14,
                           shadowOpacity: 0.06,
                           shadowBlur: 8,
-                          onTap: fileUrl != null ? () => _openUrl(context, fileUrl) : null,
+                          onTap: () => context.push('/education/${Uri.encodeComponent(it.id)}', extra: it),
                           child: Row(
                             children: [
                               Container(
@@ -65,17 +53,24 @@ class EducationScreen extends ConsumerWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(it.title(lang), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimaryAlt)),
+                                    Text(it.title(lang), maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimaryAlt)),
                                     const SizedBox(height: 2),
-                                    Text(it.desc(lang), style: const TextStyle(fontSize: 11, color: AppColors.textFaint)),
+                                    Text(
+                                      it.desc(lang),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(fontSize: 11, color: AppColors.textFaint),
+                                    ),
                                   ],
                                 ),
                               ),
-                              Icon(
-                                fileUrl != null ? Icons.file_download_outlined : Icons.chevron_right,
-                                size: fileUrl != null ? 18 : 16,
-                                color: fileUrl != null ? AppColors.navy : AppColors.textFaint,
-                              ),
+                              // Always a chevron now — tapping always opens
+                              // the detail screen (previously this showed a
+                              // download icon with no way to actually reach
+                              // it when there was no file, or a chevron that
+                              // led nowhere since the card had no tap handler
+                              // at all in that case).
+                              const Icon(Icons.chevron_right, size: 16, color: AppColors.textFaint),
                             ],
                           ),
                         );

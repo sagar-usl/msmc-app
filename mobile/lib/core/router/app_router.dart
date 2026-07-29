@@ -4,15 +4,22 @@ import '../../features/home/home_screen.dart';
 import '../../features/about/about_screen.dart';
 import '../../features/documents/documents_screen.dart';
 import '../../features/initiatives/initiatives_screen.dart';
+import '../../features/initiatives/initiative_detail_screen.dart';
+import '../../features/initiatives/data/initiatives_repository.dart';
 import '../../features/schemes/schemes_screen.dart';
 import '../../features/pm_scheme/pm_scheme_screen.dart';
 import '../../features/education/education_screen.dart';
+import '../../features/education/education_detail_screen.dart';
+import '../../features/education/data/education_repository.dart';
 import '../../features/news/news_screen.dart';
+import '../../features/news/news_detail_screen.dart';
+import '../../features/news/data/news_repository.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/feedback/feedback_screen.dart';
 import '../../features/complaint/presentation/complaint_list_screen.dart';
 import '../../features/complaint/presentation/new_complaint_screen.dart';
 import '../../features/complaint/presentation/complaint_detail_screen.dart';
+import '../../features/notifications/presentation/notifications_screen.dart';
 import 'app_shell.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -26,10 +33,22 @@ final GoRouter appRouter = GoRouter(
         GoRoute(path: '/about', builder: (context, state) => const AboutScreen()),
         GoRoute(path: '/documents', builder: (context, state) => const DocumentsScreen()),
         GoRoute(path: '/initiatives', builder: (context, state) => const InitiativesScreen()),
+        GoRoute(
+          path: '/initiatives/:id',
+          builder: (context, state) => InitiativeDetailScreen(item: state.extra as InitiativeApiItem),
+        ),
         GoRoute(path: '/schemes', builder: (context, state) => const SchemesScreen()),
         GoRoute(path: '/pm-scheme', builder: (context, state) => const PmSchemeScreen()),
         GoRoute(path: '/education', builder: (context, state) => const EducationScreen()),
+        GoRoute(
+          path: '/education/:id',
+          builder: (context, state) => EducationDetailScreen(item: state.extra as EducationApiItem),
+        ),
         GoRoute(path: '/news', builder: (context, state) => const NewsScreen()),
+        GoRoute(
+          path: '/news/:id',
+          builder: (context, state) => NewsDetailScreen(item: state.extra as NewsApiItem),
+        ),
         GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen()),
         GoRoute(path: '/feedback', builder: (context, state) => const FeedbackScreen()),
         GoRoute(path: '/complaint', builder: (context, state) => const ComplaintListScreen()),
@@ -38,6 +57,7 @@ final GoRouter appRouter = GoRouter(
           path: '/complaint/:id',
           builder: (context, state) => ComplaintDetailScreen(id: state.pathParameters['id']!),
         ),
+        GoRoute(path: '/notifications', builder: (context, state) => const NotificationsScreen()),
       ],
     ),
   ],

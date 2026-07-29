@@ -1,24 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/open_url.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/async_screen.dart';
 import '../../core/widgets/screen_header.dart';
 import 'data/documents_repository.dart';
 import 'providers/documents_provider.dart';
-
-Future<void> _openUrl(BuildContext context, String url) async {
-  final uri = Uri.parse(url);
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
-  } else if (context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Could not open this document.')),
-    );
-  }
-}
 
 class DocumentsScreen extends ConsumerStatefulWidget {
   const DocumentsScreen({super.key});
@@ -29,6 +18,25 @@ class DocumentsScreen extends ConsumerStatefulWidget {
 
 class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
   ApiDocCategory? _active; // null = All
+  bool _isSearching = false;
+  final _searchController = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _toggleSearch() {
+    setState(() {
+      _isSearching = !_isSearching;
+      if (!_isSearching) {
+        _searchController.clear();
+        _query = '';
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +45,33 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
 
     return Column(
       children: [
-        ScreenHeader(title: 'documents.title'.tr(), trailing: const Icon(Icons.search, size: 19, color: AppColors.navy)),
+        ScreenHeader(
+          title: 'documents.title'.tr(),
+          trailing: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: _toggleSearch,
+            child: SizedBox(
+              width: 34,
+              height: 34,
+              child: Icon(_isSearching ? Icons.close : Icons.search, size: 19, color: AppColors.navy),
+            ),
+          ),
+        ),
+        if (_isSearching)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+            child: TextField(
+              controller: _searchController,
+              autofocus: true,
+              onChanged: (v) => setState(() => _query = v.trim().toLowerCase()),
+              decoration: InputDecoration(
+                hintText: lang == 'mr' ? 'शीर्षकाने शोधा...' : 'Search by title...',
+                prefixIcon: const Icon(Icons.search, size: 18),
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              ),
+            ),
+          ),
         Expanded(
           child: RefreshIndicator(
             color: AppColors.navy,
@@ -46,7 +80,10 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
               value: docsAsync,
               onRetry: () => ref.read(documentsProvider.notifier).refresh(),
               builder: (items) {
-                final filtered = _active == null ? items : items.where((d) => d.category == _active).toList();
+                final filtered = items
+                    .where((d) => _active == null || d.category == _active)
+                    .where((d) => _query.isEmpty || d.title(lang).toLowerCase().contains(_query))
+                    .toList();
                 return Column(
                   children: [
                     // Category filter chips
@@ -70,7 +107,14 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
                     ),
                     Expanded(
                       child: filtered.isEmpty
-                          ? Center(child: Text('No documents.', style: const TextStyle(color: AppColors.textMuted)))
+                          ? Center(
+                              child: Text(
+                                _query.isNotEmpty
+                                    ? (lang == 'mr' ? 'कोणतेही दस्तऐवज जुळत नाहीत.' : 'No documents match your search.')
+                                    : 'No documents.',
+                                style: const TextStyle(color: AppColors.textMuted),
+                              ),
+                            )
                           : ListView.separated(
                               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
                               itemCount: filtered.length,
@@ -84,7 +128,7 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
                                   radius: 14,
                                   shadowOpacity: 0.06,
                                   shadowBlur: 8,
-                                  onTap: fileUrl != null ? () => _openUrl(context, fileUrl) : null,
+                                  onTap: fileUrl != null ? () => openExternalUrl(context, fileUrl) : null,
                                   child: Row(
                                     children: [
                                       Container(

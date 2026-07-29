@@ -7,6 +7,7 @@ class FeedbackRepository {
     required int rating,
     String? name,
     required String message,
+    required String mobile,
   }) async {
     await ApiClient.instance.post<Map<String, dynamic>>(
       '/api/v1/feedback',
@@ -14,6 +15,7 @@ class FeedbackRepository {
         'rating': rating,
         if (name != null && name.isNotEmpty) 'name': name,
         'message': message,
+        'mobile': mobile,
       },
     );
   }

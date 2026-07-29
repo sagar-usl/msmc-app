@@ -1,19 +1,23 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/auth/auth_state_provider.dart';
 import '../../core/network/api_exception.dart';
+import '../../core/storage/secure_storage.dart';
 import '../../core/widgets/app_card.dart';
+import '../../core/widgets/login_required_view.dart';
 import '../../core/widgets/screen_header.dart';
 import 'data/feedback_repository.dart';
 
-class FeedbackScreen extends StatefulWidget {
+class FeedbackScreen extends ConsumerStatefulWidget {
   const FeedbackScreen({super.key});
 
   @override
-  State<FeedbackScreen> createState() => _FeedbackScreenState();
+  ConsumerState<FeedbackScreen> createState() => _FeedbackScreenState();
 }
 
-class _FeedbackScreenState extends State<FeedbackScreen> {
+class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
   final _repo = const FeedbackRepository();
   final _nameController = TextEditingController();
   final _messageController = TextEditingController();
@@ -42,10 +46,16 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
     setState(() => _isSubmitting = true);
     try {
+      final mobile = await SecureStorage.instance.getMobile();
+      if (mobile == null) {
+        setState(() { _serverError = 'auth.loginRequiredFeedback'.tr(); _isSubmitting = false; });
+        return;
+      }
       await _repo.submitFeedback(
         rating: _rating,
         name: _nameController.text.trim(),
         message: message,
+        mobile: mobile,
       );
       setState(() {
         _submitted = true;
@@ -78,11 +88,18 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loggedInAsync = ref.watch(isLoggedInProvider);
     return Column(
       children: [
         ScreenHeader(title: 'feedback.headerTitle'.tr(), onBack: () => Navigator.of(context).maybePop()),
         Expanded(
-          child: _submitted ? _buildThankYou() : _buildForm(),
+          child: loggedInAsync.when(
+            data: (loggedIn) => loggedIn
+                ? (_submitted ? _buildThankYou() : _buildForm())
+                : LoginRequiredView(message: 'auth.loginRequiredFeedback'.tr()),
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (_, __) => LoginRequiredView(message: 'auth.loginRequiredFeedback'.tr()),
+          ),
         ),
       ],
     );

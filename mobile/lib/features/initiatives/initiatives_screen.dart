@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/async_screen.dart';
@@ -56,17 +57,16 @@ class _InitiativeCard extends StatelessWidget {
       radius: 16,
       shadowOpacity: 0.14,
       shadowBlur: 20,
+      onTap: () => context.push('/initiatives/${Uri.encodeComponent(item.id)}', extra: item),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             child: SizedBox(
-              height: 100,
+              height: 150,
               width: double.infinity,
-              child: imageUrls.isEmpty
-                  ? const _ImagePlaceholder()
-                  : _ImageCarousel(imageUrls: imageUrls),
+              child: imageUrls.isEmpty ? const _ImagePlaceholder() : _ImageCollage(imageUrls: imageUrls),
             ),
           ),
           Padding(
@@ -85,7 +85,12 @@ class _InitiativeCard extends StatelessWidget {
                 ),
                 if (item.description(lang).isNotEmpty) ...[
                   const SizedBox(height: 6),
-                  Text(item.description(lang), style: const TextStyle(fontSize: 11.5, color: AppColors.textMuted, height: 1.5)),
+                  Text(
+                    item.description(lang),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 11.5, color: AppColors.textMuted, height: 1.5),
+                  ),
                 ],
               ],
             ),
@@ -96,60 +101,87 @@ class _InitiativeCard extends StatelessWidget {
   }
 }
 
-class _ImageCarousel extends StatefulWidget {
+/// Instagram/WhatsApp-style static preview grid — shows as much of the post
+/// at a glance as possible instead of hiding everything but one image behind
+/// a swipe. The full swipeable gallery lives on the detail screen.
+class _ImageCollage extends StatelessWidget {
   final List<String> imageUrls;
-  const _ImageCarousel({required this.imageUrls});
-
-  @override
-  State<_ImageCarousel> createState() => _ImageCarouselState();
-}
-
-class _ImageCarouselState extends State<_ImageCarousel> {
-  final _controller = PageController();
-  int _page = 0;
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  const _ImageCollage({required this.imageUrls});
 
   @override
   Widget build(BuildContext context) {
+    switch (imageUrls.length) {
+      case 1:
+        return _tile(imageUrls[0]);
+      case 2:
+        return Row(
+          children: [
+            Expanded(child: _tile(imageUrls[0])),
+            const SizedBox(width: 2),
+            Expanded(child: _tile(imageUrls[1])),
+          ],
+        );
+      case 3:
+        return Row(
+          children: [
+            Expanded(child: _tile(imageUrls[0])),
+            const SizedBox(width: 2),
+            Expanded(
+              child: Column(
+                children: [
+                  Expanded(child: _tile(imageUrls[1])),
+                  const SizedBox(height: 2),
+                  Expanded(child: _tile(imageUrls[2])),
+                ],
+              ),
+            ),
+          ],
+        );
+      default:
+        final extra = imageUrls.length - 4;
+        return Column(
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  Expanded(child: _tile(imageUrls[0])),
+                  const SizedBox(width: 2),
+                  Expanded(child: _tile(imageUrls[1])),
+                ],
+              ),
+            ),
+            const SizedBox(height: 2),
+            Expanded(
+              child: Row(
+                children: [
+                  Expanded(child: _tile(imageUrls[2])),
+                  const SizedBox(width: 2),
+                  Expanded(
+                    child: extra > 0 ? _tile(imageUrls[3], overlayLabel: '+$extra') : _tile(imageUrls[3]),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+    }
+  }
+
+  Widget _tile(String url, {String? overlayLabel}) {
     return Stack(
       fit: StackFit.expand,
       children: [
-        PageView.builder(
-          controller: _controller,
-          itemCount: widget.imageUrls.length,
-          onPageChanged: (i) => setState(() => _page = i),
-          itemBuilder: (context, i) => Image.network(
-            widget.imageUrls[i],
-            fit: BoxFit.cover,
-            loadingBuilder: (_, child, prog) => prog == null ? child : const _ImagePlaceholder(),
-            errorBuilder: (_, __, ___) => const _ImagePlaceholder(),
-          ),
+        Image.network(
+          url,
+          fit: BoxFit.cover,
+          loadingBuilder: (_, child, prog) => prog == null ? child : const _ImagePlaceholder(),
+          errorBuilder: (_, __, ___) => const _ImagePlaceholder(),
         ),
-        if (widget.imageUrls.length > 1)
-          Positioned(
-            bottom: 8,
-            left: 0,
-            right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(widget.imageUrls.length, (i) {
-                final active = i == _page;
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 2),
-                  width: active ? 14 : 5,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: active ? 0.95 : 0.55),
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                );
-              }),
-            ),
+        if (overlayLabel != null)
+          Container(
+            color: Colors.black.withValues(alpha: 0.45),
+            alignment: Alignment.center,
+            child: Text(overlayLabel, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
           ),
       ],
     );

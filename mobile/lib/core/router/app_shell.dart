@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/notifications/providers/notifications_provider.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/app_header.dart';
@@ -10,25 +12,30 @@ import '../widgets/bottom_nav_bar.dart';
 /// screen the current route resolves to — mirrors the prototype's app shell
 /// where every screen (bottom-nav tab or drawer item) renders inside the
 /// same header+bottomnav frame.
-class AppShell extends StatefulWidget {
+class AppShell extends ConsumerStatefulWidget {
   final Widget child;
 
   const AppShell({super.key, required this.child});
 
   @override
-  State<AppShell> createState() => _AppShellState();
+  ConsumerState<AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<AppShell> {
+class _AppShellState extends ConsumerState<AppShell> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
+    final hasUnread = (ref.watch(notificationsProvider).value?.unreadCount ?? 0) > 0;
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: AppColors.background,
-      appBar: AppHeader(onMenuTap: () => _scaffoldKey.currentState?.openEndDrawer()),
+      appBar: AppHeader(
+        onMenuTap: () => _scaffoldKey.currentState?.openEndDrawer(),
+        onNotificationsTap: () => context.push('/notifications'),
+        hasUnreadNotifications: hasUnread,
+      ),
       endDrawer: AppDrawer(
         onSelect: (route) {
           _scaffoldKey.currentState?.closeEndDrawer();
